@@ -5,18 +5,23 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { fetchAllFromFeaturesAPI } from '../../services/api';
 import { ChartData } from '../../dataModel/chart';
+import { DataFrequency, measurementLegend } from '../../constants';
 import { 
+  categorizeStations,
   getChartColor,
   getChartLegend,
   getYAxisLabel,
   getDataAccessURL,
 } from '../../utils/helpers';
 
+import { FrequencyDropdown } from '../../components/dropdown';
+import { Title } from '../../components/title';
+import { Legend } from '../../components/legend';
+
 import {
   MainMap,
   MarkerFeature,
   LoadingSpinner,
-  Title,
   MapZoom,
   MainChart,
   ChartTools,
@@ -36,7 +41,6 @@ import './index.css';
 import { ShowChart } from '@mui/icons-material';
 
 const TITLE = 'NOAA: ESRL Global Monitoring Laboratory';
-const DESCRIPTION = '';
 
 const HorizontalLayout = styled.div`
   width: 90%;
@@ -56,8 +60,7 @@ export function Dashboard({
   setZoomLocation,
   loadingData,
   ghg,
-  frequency,
-  setSelectedGHG,
+  selectedFrequency,
   setSelectedFrequency,
   agency,
 }) {
@@ -66,13 +69,12 @@ export function Dashboard({
   const [vizItems, setVizItems] = useState([]); // store all available visualization items
   const [selectedRegionId, setSelectedRegionId] = useState(''); // region_id of the selected region (marker)
   const prevSelectedRegionId = useRef(''); // to be able to restore to previously selected region.
-  const [selectedVizItems, setSelectedVizItems] = useState([]); // all visualization items for the selected region (marker)
-  const [hoveredVizLayerId, setHoveredVizLayerId] = useState(''); // vizItem_id of the visualization item which was hovered over
-  const [filteredVizItems, setFilteredVizItems] = useState([]); // visualization items for the selected region with the filter applied
+  const [hoveredStationId, setHoveredStationId] = useState(''); // vizItem_id of the visualization item which was hovered over
   const [loadingChartData, setLoadingChartData] = useState(false);
-  const [showMarkerFeature, setShowMarkerFeature] = useState(true);
   const [chartData, setChartData] = useState([]);
   const [dataAccessURL, setDataAccessURL] = useState('');
+  const [legendData, setLegendData] = useState([]);
+
 
   // handler functions
   const handleSelectedVizItem = (vizItemId) => {
@@ -82,16 +84,27 @@ export function Dashboard({
   const handleChartClose = () => {
     setDisplayChart(false);   
   }
-  
+
+  useEffect(() => {
+    if (Array.isArray(vizItems)) {
+      const newLegendData = vizItems
+        .filter(item => selectedFrequency === 'all' || Object.keys(item)[0] === selectedFrequency)
+        .map(item => {
+          const category = Object.keys(item)[0];
+          return {
+            text: measurementLegend[category].shortText,
+            color: item[category].color,
+          };
+        });
+      setLegendData(newLegendData);
+    }
+  }, [vizItems, selectedFrequency]);
+
   useEffect(() => {
     if (!stationData) return;
-  
-    const vizItems = {}; // visualization_items[string] = visualization_item
-    Object.entries(stationData).forEach(([key, items]) => {
-      vizItems[key] = items;
-    });
-    setVizItems(vizItems); // Store the object
-    console.log('station Data', stationData);
+
+    const categorizedData = categorizeStations(stationData, measurementLegend);
+    setVizItems(categorizedData); // Store the object
   }, [stationData]);
 
   useEffect(() => {
@@ -100,10 +113,11 @@ export function Dashboard({
   
       const selectedStation = stationData[selectedStationId];
       if (!selectedStation?.collection_items) return;
-  
+      
+      setDisplayChart(true);
       setLoadingChartData(true);
       setChartData([]);
-      setDisplayChart(true);
+      
   
       // Create a deep copy of stationData to avoid mutation
       const updatedStationData = { ...stationData };
@@ -152,6 +166,7 @@ export function Dashboard({
         setStationData(updatedStationData);
         setChartData(processedChartData);
 
+        console.log(updatedStationData[selectedStationId])
         // Set data access URL
         setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
       } catch (error) {
@@ -183,19 +198,36 @@ export function Dashboard({
         >
           <div id='dashboard-map-container'>
               <MainMap>
-                <Paper className='title-container'>
-                  <Title title={TITLE} description={DESCRIPTION} />
+                <Paper className='title-wrapper' sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                  <Title title={TITLE} ghg={ghg} frequency={selectedFrequency} />
                 </Paper>
+                <img src={process.env.PUBLIC_URL + "/noaa-logo.png"} alt="NOAA" className='logo'/>
 
                 <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
-                <MarkerFeature
-                  vizItems={Object.keys(vizItems).map((key) => vizItems[key])}
-                  onSelectVizItem={handleSelectedVizItem}
-                ></MarkerFeature>
-                
+                {vizItems.map((item) => {
+                  const [category, data] = Object.entries(item)[0];
+
+                  // Conditionally render Marke based on selectedFrequency
+                  if (selectedFrequency === "all" || selectedFrequency === category) {
+                    return (
+                      <MarkerFeature
+                        key={category}
+                        vizItems={Object.values(data.stations)}
+                        onSelectVizItem={handleSelectedVizItem}
+                        markerColor={data.color}
+                      />
+                    );
+                  }
+
+                  return null; // Ensure nothing is rendered if conditions don't match
+                })}
+                <FrequencyDropdown
+                  selectedValue={selectedFrequency}
+                  setSelectedValue={setSelectedFrequency}
+                />
+                <Legend legendData={legendData} />
               </MainMap>
-            
-            </div>
+          </div>
         </Panel>
         {displayChart && (
           <>

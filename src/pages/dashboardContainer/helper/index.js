@@ -20,6 +20,7 @@ export const extractStationCollections = (
         collection.id.includes(ghg) &&
         collection.id.includes(dataCategory) &&
         collection.id.includes(region)
+
       ) {
         // TODO: remove later after the functionality to add properties in collections is implemented in Features API directly.
         let stationId = getStationId(collection.id);

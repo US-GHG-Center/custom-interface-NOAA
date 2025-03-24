@@ -96,7 +96,7 @@ export function dataTransformCollection(
 
         // Add only items matching the new ghg and time_period
         if (gas === ghg_filter) {
-          station.collection_items.push({
+            station.collection_items?.push({
             id: collection.id,
             gas: gas,
             gas_full_name: gas,

@@ -2,9 +2,49 @@ import mockStationData from '../assets/dataset/stations';
 import { Station, CollectionItem } from '../dataModel/station';
 import { GreenhouseGas, InstrumentType, greenhouseGases, measurementInstruments, timePeriodMapping } from '../constants';
 
+interface CategorizedStation {
+  color: string;
+  stations: Array<Station & { categoryText: string }>;
+}
+
+type CategorizedStations = Record<string, Record<string, CategorizedStation>>;
+
 export function getMockStationData(): Record<string, any> {
   return mockStationData;
 }
+
+export function categorizeStations(
+  stationData: Record<string, Station>, 
+  legendsDictionary: Record<string, any>
+): Array<Record<string, { stations: Record<string, Station>, color: string }>> {
+  if (!stationData) return [];
+
+  const categorizedStations: Record<string, { stations: Record<string, Station>, color: string }> = {};
+
+  Object.entries(stationData).forEach(([stationKey, station]) => {
+    if (!station.collection_items || station.collection_items.length === 0) return;
+    
+    const isContinuous = station.collection_items.some(item => 
+      item.measurement_inst === "insitu" &&
+      (item.methodology === "surface" || item.methodology === "tower")
+    );
+   
+    const categoryKey = isContinuous ? "continuous" : "non_continuous";
+    
+    if (!categorizedStations[categoryKey]) {
+      categorizedStations[categoryKey] = {
+        stations: {},
+        color: legendsDictionary[categoryKey]?.color || (categoryKey === "continuous" ? "#0000FF" : "#00FF00")
+      };
+    }
+    
+    categorizedStations[categoryKey].stations[stationKey] = station;
+  });
+
+  return Object.entries(categorizedStations)
+    .map(([key, value]) => ({ [key]: value }));
+}
+
 
 
 export function getChartColor(collectionItem: CollectionItem): string {

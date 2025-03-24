@@ -29,15 +29,11 @@
 
 .logo {
   position: fixed;
-  top: 1%;
-  right: 1%;
-  width: 275px;
+  top: .7rem;
+  right: .7rem;
+  width: 80px;
   height: auto;
-  padding: 10px 24px;
   color: #082a63;
-  background-color: rgba(255, 255, 255);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
   z-index: 1000;
 }
 .map-icon {
