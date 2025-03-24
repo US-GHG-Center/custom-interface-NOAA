@@ -42,7 +42,7 @@ jobs:
           pip install -r ./requirements.txt
           python3 ./main.py
           python3 ./convert_to_geojson.py
-          python2 ./metadata.py
+          python3 ./metadata.py
 
       - name: Upload processed data
         uses: actions/upload-artifact@v4
