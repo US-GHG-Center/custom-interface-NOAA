@@ -57,7 +57,9 @@ def process_csv_files():
     # Convert to GeoDataFrame
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs="EPSG:4326")
     # Save as GeoJSON
-    gdf.to_file("data/geojson/noaa_glm_station_metadata.geojson", driver="GeoJSON")
+    output_dir = "data/geojson"
+    os.makedirs(output_dir, exist_ok=True)
+    gdf.to_file(f"{output_dir}/noaa_glm_station_metadata.geojson", driver="GeoJSON")
 
 # Main function
 def main():
