@@ -11,8 +11,8 @@ def process_csv_files():
     # Process all CSV files recursively
     df = pd.DataFrame(columns=['site_code', 'site_name', 'site_country','site_elevation','site_elevation_unit','latitude','longitude'])
     site_dict = {}
-    print(len(glob.glob("data/processed/**/*.csv", recursive=True)))
-    for file in glob.glob("data/processed/**/*.csv", recursive=True):
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    for file in glob.glob(os.path.join(script_dir, "../data/processed/**/*.csv"), recursive=True):
         tmp = pd.read_csv(file)
         gas = file.split("/")[-1].split("_")[6]
         methodology = file.split("/")[-1].split("_")[3]
