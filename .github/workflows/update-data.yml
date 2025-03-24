@@ -1,0 +1,193 @@
+name: Update data on a schedule
+
+on:
+    schedule:
+      - cron: 0 0 1 * * # Runs on the first day of every month
+    workflow_dispatch: # Can be run manually if needed
+
+jobs:
+  preprocess-data:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate required variables and secrets
+        run: |
+          missing_vars=()
+          [ -z "${{ secrets.GITHUB_TOKEN }}" ] && missing_vars+=("secrets.GITHUB_TOKEN")
+          if [ ${#missing_vars[@]} -ne 0 ]; then
+            echo "Error: The following required variables are missing:"
+            printf '%s\n' "${missing_vars[@]}"
+            exit 1
+          fi
+        shell: bash
+
+      # Downloads and extracts the files to the respective directory
+      - name: Run the data download script
+        run: |
+          cd ./data_processing
+          ./download.sh
+
+      # Runs data preprocessing and aggregation
+      - name: Run data preprocessing and aggregation
+        run: |
+          cd ./data_processing
+          pip install -r ./data_processing/requirements.txt
+          python3 ./main.py
+          python3 ./convert_to_geojson.py
+          python2 ./metadata.py
+
+      - name: Upload processed data
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-geojson
+          path: ./data/geojson
+
+      - name : Remove local files
+        run: |
+          rm -rf ./data
+          
+
+      - name: Set current date as env variable
+        run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+    outputs:
+      now: ${{ env.NOW }}
+
+  ingest-data-dev:
+
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    needs: preprocess-data
+    environment: development 
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download processed data
+        uses: actions/download-artifact@v4
+        with:
+          name: processed-geojson
+          path: ./data/geojson
+
+      - name: ConfigureAWS Credentials 
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
+          role-session-name: ${{ github.repository_owner}}
+          aws-region: us-west-2
+
+      # Upload the transformed files to a s3 location and remove the folder after that
+      - name: Upload to S3
+        # only overwrites files that have changed, deletes file that exist in S3 but not locally
+        run: |
+          ls -l ./data/
+          aws s3 sync ./data/geojson s3://${{ vars.DEPLOYMENT_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+
+      - name : Remove local files
+        run: |
+          rm -rf ./data
+
+      - name: Ingest collections to Features API - dev
+        id: ingest-collections-dev
+        run: |
+          export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          export SM2A_ADMIN_USERNAME="${{ secrets.DEV_SM2A_ADMIN_USERNAME }}"
+          export SM2A_ADMIN_PASSWORD="${{ secrets.DEV_SM2A_ADMIN_PASSWORD }}"
+          export SM2A_API_URL="${{ vars.DEV_SM2A_API_URL }}"
+          export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
+
+          pip install -r ./data_processing/ingestion/requirements.txt
+          python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
+    
+  # ingest-data-staging:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+      # id-token: write
+      # contents: read
+  #   needs: preprocess-data
+  #   environment: staging 
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: ConfigureAWS Credentials 
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
+  #         role-session-name: ${{ github.repository_owner}}
+  #         aws-region: us-west-2
+
+  #     Upload the transformed files to a s3 location and remove the folder after that
+  #     - name: Upload to S3
+  #       # only overwrites files that have changed, deletes file that exist in S3 but not locally
+  #       run: |
+  #         aws s3 sync ./noaa-cpfp-point/data/geojson s3://${{ vars.DEPLOYMENT_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+
+    
+  #     - name : Remove local files
+  #       run: |
+  #         rm -rf ./noaa-cpfp-point/data
+
+  #     - name: Ingest collections to Features API - staging
+  #       id: ingest-collections-staging
+  #       run: |
+  #         export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+  #         export SM2A_ADMIN_USERNAME="${{ secrets.DEV_SM2A_ADMIN_USERNAME }}"
+  #         export SM2A_ADMIN_PASSWORD="${{ secrets.DEV_SM2A_ADMIN_PASSWORD }}"
+  #         export SM2A_API_URL="${{ vars.DEV_SM2A_API_URL }}"
+  #         export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
+
+  #         pip install -r ./scripts/requirements.txt
+  #         python3 ./scripts/ingest_collection.py ./scripts/NOAA-dag-config.json
+    
+  # ingest-data-prod:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+      # id-token: write
+      # contents: read
+  #   needs: preprocess-data
+  #   environment: production 
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: ConfigureAWS Credentials 
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
+  #         role-session-name: ${{ github.repository_owner}}
+  #         aws-region: us-west-2
+
+  #     Upload the transformed files to a s3 location and remove the folder after that
+  #     - name: Upload to S3
+  #       # only overwrites files that have changed, deletes file that exist in S3 but not locally
+  #       run: |
+  #         aws s3 sync ./noaa-cpfp-point/data/geojson s3://${{ vars.DEPLOYMENT_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+
+    
+  #     - name : Remove local files
+  #       run: |
+  #         rm -rf ./noaa-cpfp-point/data
+
+  #     - name: Ingest collections to Features API - prod
+  #       id: ingest-collections-prod
+  #       run: |
+  #         export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+  #         export SM2A_ADMIN_USERNAME="${{ secrets.DEV_SM2A_ADMIN_USERNAME }}"
+  #         export SM2A_ADMIN_PASSWORD="${{ secrets.DEV_SM2A_ADMIN_PASSWORD }}"
+  #         export SM2A_API_URL="${{ vars.DEV_SM2A_API_URL }}"
+  #         export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
+
+  #         env | grep 'SM2A'
+
+  #         pip install -r ./scripts/requirements.txt
+  #         python3 ./scripts/ingest_collection.py ./scripts/NOAA-dag-config.json
+    

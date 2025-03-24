@@ -1,0 +1,14 @@
+{
+    "bucket": "ghgc-data-store-develop",
+    "collection": "",
+    "extra_flags": [
+        "-overwrite"
+    ],
+    "filename_regex": ".*noaa_glm_flask_surface_ABP_Brazil_ch4_event.*",
+    "id_template": "cicd_{}",
+    "invalidate_cloudfront": true,
+    "prefix": "NOAA_features_API/",
+    "source_projection": "EPSG:4326",
+    "target_projection": "EPSG:4326",
+    "vector": true
+}
