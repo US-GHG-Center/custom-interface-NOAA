@@ -39,7 +39,7 @@ jobs:
       - name: Run data preprocessing and aggregation
         run: |
           cd ./data_processing
-          pip install -r ./data_processing/requirements.txt
+          pip install -r ./requirements.txt
           python3 ./main.py
           python3 ./convert_to_geojson.py
           python2 ./metadata.py
