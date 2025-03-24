@@ -33,7 +33,6 @@ jobs:
       # Downloads and extracts the files to the respective directory
       - name: Run the data download script
         run: |
-          cd ./data_processing
           ./download.sh
 
       # Runs data preprocessing and aggregation
