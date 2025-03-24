@@ -4,6 +4,9 @@ on:
     schedule:
       - cron: 0 0 1 * * # Runs on the first day of every month
     workflow_dispatch: # Can be run manually if needed
+    push:
+      branches:
+        - update-data 
 
 jobs:
   preprocess-data:
@@ -99,9 +102,9 @@ jobs:
         id: ingest-collections-dev
         run: |
           export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          export SM2A_ADMIN_USERNAME="${{ secrets.DEV_SM2A_ADMIN_USERNAME }}"
-          export SM2A_ADMIN_PASSWORD="${{ secrets.DEV_SM2A_ADMIN_PASSWORD }}"
-          export SM2A_API_URL="${{ vars.DEV_SM2A_API_URL }}"
+          export SM2A_ADMIN_USERNAME="${{ secrets.SM2A_ADMIN_USERNAME }}"
+          export SM2A_ADMIN_PASSWORD="${{ secrets.SM2A_ADMIN_PASSWORD }}"
+          export SM2A_API_URL="${{ vars.SM2A_API_URL }}"
           export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
 
           pip install -r ./data_processing/ingestion/requirements.txt
