@@ -72,7 +72,7 @@ export const timePeriodMapping: Record<string, string> = {
 // Legend mapping for visualization with hex color codes
 export const measurementLegend = {
     [DataFrequency.CONTINUOUS]: {
-        color: "#00b7eb", // Blue
+        color: "#00B7EB", // Blue
         text: "Continuous Measurements (Surface and Tower In-situ)",
         shortText: "Continuous Measurements"
     },

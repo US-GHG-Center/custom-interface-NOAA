@@ -1,21 +1,24 @@
 import mockStationData from '../assets/dataset/stations';
 import { Station, CollectionItem } from '../dataModel/station';
-import { GreenhouseGas, InstrumentType, greenhouseGases, measurementInstruments, timePeriodMapping } from '../constants';
+import { GreenhouseGas, InstrumentType, greenhouseGases, measurementInstruments, measurementLegend, timePeriodMapping } from '../constants';
 
 interface CategorizedStation {
   color: string;
   stations: Array<Station & { categoryText: string }>;
 }
 
-type CategorizedStations = Record<string, Record<string, CategorizedStation>>;
+// type CategorizedStations = Record<string, Record<string, CategorizedStation>>;
+
 
 export function getMockStationData(): Record<string, any> {
   return mockStationData;
 }
 
+
 export function categorizeStations(
   stationData: Record<string, Station>, 
-  legendsDictionary: Record<string, any>
+  legendsDictionary: Record<string, any>,
+  dataFrequency: 'continuous' | 'non_continuous' | 'all'
 ): Array<Record<string, { stations: Record<string, Station>, color: string }>> {
   if (!stationData) return [];
 
@@ -23,27 +26,69 @@ export function categorizeStations(
 
   Object.entries(stationData).forEach(([stationKey, station]) => {
     if (!station.collection_items || station.collection_items.length === 0) return;
-    
-    const isContinuous = station.collection_items.some(item => 
-      item.measurement_inst === "insitu" &&
+
+    // Apply filter based on dataFrequency
+    let filteredItems = station.collection_items;
+
+    if (dataFrequency === 'continuous') {
+      filteredItems = filteredItems.filter(item =>
+        item.measurement_inst === "insitu" &&
+        (item.methodology === "surface" || item.methodology === "tower")
+      );
+    } else if (dataFrequency === 'non_continuous') {
+      filteredItems = filteredItems.filter(item =>
+        !(item.measurement_inst === "insitu" &&
+        (item.methodology === "surface" || item.methodology === "tower"))
+      );
+    }
+
+    if (filteredItems.length === 0) return; // Skip stations with no valid collection items
+
+    // Determine station continuity based on filtered data
+    const isContinuous = filteredItems.some(item => 
+      item.measurement_inst === "insitu" && 
       (item.methodology === "surface" || item.methodology === "tower")
     );
-   
+
     const categoryKey = isContinuous ? "continuous" : "non_continuous";
-    
+
     if (!categorizedStations[categoryKey]) {
       categorizedStations[categoryKey] = {
         stations: {},
         color: legendsDictionary[categoryKey]?.color || (categoryKey === "continuous" ? "#0000FF" : "#00FF00")
       };
     }
-    
-    categorizedStations[categoryKey].stations[stationKey] = station;
+
+    // Store station with only the filtered collection items
+    categorizedStations[categoryKey].stations[stationKey] = {
+      ...station,
+      collection_items: filteredItems
+    };
   });
 
-  return Object.entries(categorizedStations)
-    .map(([key, value]) => ({ [key]: value }));
+  return Object.entries(categorizedStations).map(([key, value]) => ({ [key]: value }));
 }
+
+
+export function getPopUpContent(station: Station): string {
+  // Extract latitude and longitude from Geometry
+  const [lon, lat] = station.geometry.coordinates[0][0]; // Assuming the first coordinate pair is representative
+
+  // Extract unique measurement types
+  const uniqueMeasurements = Array.from(
+    new Set(station.collection_items?.map(item => `${item.methodology}-${item.measurement_inst}`))
+  ).join("; ");
+
+  return `
+    <b>${station.id}: ${station.meta.site_name}</b><br>
+    <b>${station.meta.site_country}</b><br>
+    Latitude: ${lat}<br>
+    Longitude: ${lon}<br>
+    Elevation: ${station.meta.site_elevation}<br>
+    Measurement Type: ${uniqueMeasurements}
+  `;
+}
+
 
 
 

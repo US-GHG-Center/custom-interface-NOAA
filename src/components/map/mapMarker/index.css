@@ -9,3 +9,10 @@
   border-radius: 50%;
   cursor: pointer;
 }
+
+.mapboxgl-popup-content {
+  background-color: rgba(255, 255, 255, 0.9); /* Dark semi-transparent background */
+  color: black; /* White text for contrast */
+  padding: 10px;
+  border-radius: 8px;
+}

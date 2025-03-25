@@ -3,15 +3,15 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import { fetchAllFromFeaturesAPI } from '../../services/api';
-import { ChartData } from '../../dataModel/chart';
-import { DataFrequency, measurementLegend } from '../../constants';
+import { measurementLegend } from '../../constants';
+
 import { 
   categorizeStations,
   getChartColor,
   getChartLegend,
   getYAxisLabel,
   getDataAccessURL,
+  getPopUpContent,
 } from '../../utils/helpers';
 
 import { FrequencyDropdown } from '../../components/dropdown';
@@ -38,7 +38,6 @@ import {
 import styled from 'styled-components';
 
 import './index.css';
-import { ShowChart } from '@mui/icons-material';
 
 const TITLE = 'NOAA: ESRL Global Monitoring Laboratory';
 
@@ -55,10 +54,9 @@ export function Dashboard({
   selectedStationId,
   setSelectedStationId,
   zoomLevel,
-  setZoomLevel,
   zoomLocation,
-  setZoomLocation,
   loadingData,
+  setLoadingData,
   ghg,
   selectedFrequency,
   setSelectedFrequency,
@@ -67,10 +65,6 @@ export function Dashboard({
   // states for data
   const [displayChart, setDisplayChart] = useState(false);
   const [vizItems, setVizItems] = useState([]); // store all available visualization items
-  const [selectedRegionId, setSelectedRegionId] = useState(''); // region_id of the selected region (marker)
-  const prevSelectedRegionId = useRef(''); // to be able to restore to previously selected region.
-  const [hoveredStationId, setHoveredStationId] = useState(''); // vizItem_id of the visualization item which was hovered over
-  const [loadingChartData, setLoadingChartData] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [dataAccessURL, setDataAccessURL] = useState('');
   const [legendData, setLegendData] = useState([]);
@@ -78,8 +72,13 @@ export function Dashboard({
 
   // handler functions
   const handleSelectedVizItem = (vizItemId) => {
-    setSelectedStationId(vizItemId);
+    if (vizItemId === selectedStationId) {
+      setDisplayChart(true);
+    } else {
+      setSelectedStationId(vizItemId);
+    }
   };
+    
 
   const handleChartClose = () => {
     setDisplayChart(false);   
@@ -100,89 +99,67 @@ export function Dashboard({
     }
   }, [vizItems, selectedFrequency]);
 
+
+  useEffect(() => {
+    if (!selectedStationId || !vizItems) return;
+    setDisplayChart(false);
+    setLoadingData(true);
+    setChartData([]);
+  
+    let selectedCategory;
+  
+    // First, check if the station exists in 'continuous' category
+    const continuousCategory = vizItems.find((item) => item['continuous']);
+    if (continuousCategory && continuousCategory.continuous.stations[selectedStationId]) {
+      selectedCategory = continuousCategory;
+    }
+
+    // If not found in 'continuous', fallback to selectedFrequency category
+    if (!selectedCategory) {
+      selectedCategory = vizItems.find((item) => item['non_continuous']);
+    }
+      
+    if (selectedCategory) {
+      const categoryKey = Object.keys(selectedCategory)[0]; // Extract category name
+      const selectedStation = selectedCategory[categoryKey].stations[selectedStationId];
+      const processedChartData = [];
+      if (selectedStation?.collection_items) {
+        selectedStation.collection_items.forEach((item) => {
+          if (item.datetime && item.value) {
+            processedChartData.push({
+              id: item.id,
+              label: Array.isArray(item.datetime) ? item.datetime : [item.datetime],
+              value: Array.isArray(item.value) ? item.value : [item.value],
+              color: getChartColor(item) || '#1976d2',
+              legend: getChartLegend(item),
+              labelX: 'Observation Date/Time (UTC)',
+              labelY: getYAxisLabel(item),
+              displayLine: item.time_period === 'monthly' || item.time_period === 'yearly',
+            });
+          }
+        });
+        setChartData(processedChartData);
+      }
+    }
+
+    // Set data access URL
+    setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
+
+    setLoadingData(false);
+  }, [selectedStationId, vizItems, selectedFrequency]);
+  
+
   useEffect(() => {
     if (!stationData) return;
 
-    const categorizedData = categorizeStations(stationData, measurementLegend);
-    setVizItems(categorizedData); // Store the object
-  }, [stationData]);
+    const categorizedData = categorizeStations(stationData, measurementLegend, selectedFrequency);
+    setVizItems(categorizedData);
+  }, [stationData, selectedFrequency]);
 
-  useEffect(() => {
-    const fetchCollectionItemValue = async () => {
-      if (!selectedStationId || !stationData) return;
   
-      const selectedStation = stationData[selectedStationId];
-      if (!selectedStation?.collection_items) return;
-      
-      setDisplayChart(true);
-      setLoadingChartData(true);
-      setChartData([]);
-      
-  
-      // Create a deep copy of stationData to avoid mutation
-      const updatedStationData = { ...stationData };
-      const updatedStation = { ...updatedStationData[selectedStationId] };
-      updatedStationData[selectedStationId] = updatedStation;
-  
-      const processedChartData = [];
-  
-      try {
-        // Fetch missing datetime and values in parallel
-        await Promise.all(
-          selectedStation.collection_items.map(async (item, index) => {
-            if (!item.datetime || !item.value) {
-              try {
-                const response = await fetchAllFromFeaturesAPI(
-                  `https://dev.ghg.center/api/features/collections/${item.id}/items`
-                );
-  
-                if (response.length > 0) {
-                  item.datetime = response[0].properties.datetime;
-                  item.value = response[0].properties.value;
-                }
-              } catch (error) {
-                console.error(`Error fetching data for item ${item.id}:`, error);
-                return;
-              }
-            }
-  
-            // Add to chart data if datetime and values exist
-            if (item.datetime && item.value) {
-              processedChartData.push({
-                id: item.id,
-                label: Array.isArray(item.datetime) ? item.datetime : [item.datetime],
-                value: Array.isArray(item.value) ? item.value : [item.value],
-                color: getChartColor(item) || '#1976d2',
-                legend: getChartLegend(item),
-                labelX: 'Observation Date/Time (UTC)',
-                labelY: getYAxisLabel(item),
-                displayLine: item.time_period === 'monthly' || item.time_period === 'yearly',
-              });
-            }
-          })
-        );
-  
-        // Update station data and chart data
-        setStationData(updatedStationData);
-        setChartData(processedChartData);
-
-        console.log(updatedStationData[selectedStationId])
-        // Set data access URL
-        setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
-      } catch (error) {
-        console.error('Error in fetchCollectionItemValue:', error);
-        setDisplayChart(false);
-      } finally {
-        setLoadingChartData(false);
-      }
-    };
-  
-    fetchCollectionItemValue();
-  }, [selectedStationId]);
-
   useEffect(() => {
     setDisplayChart(chartData.length > 0);
-    }, [chartData]);
+  }, [chartData]);
 
   
   return (
@@ -215,6 +192,7 @@ export function Dashboard({
                         vizItems={Object.values(data.stations)}
                         onSelectVizItem={handleSelectedVizItem}
                         markerColor={data.color}
+                        getPopupContent={getPopUpContent}
                       />
                     );
                   }
@@ -262,7 +240,6 @@ export function Dashboard({
                       stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')'  : 
                       'Chart' }
                     </ChartTitle>
-                    { loadingChartData && <LoadingSpinner />}
                     {chartData.length > 0 && chartData.map((data, index) => (
                       (
                         <LineChart
@@ -282,7 +259,7 @@ export function Dashboard({
           </>
         )}
       </PanelGroup>
-      {loadingData && <LoadingSpinner />}
+      {(loadingData) && <LoadingSpinner />}
     </Box>
   );
 }

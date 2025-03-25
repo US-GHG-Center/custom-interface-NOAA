@@ -14,6 +14,7 @@ export const ChartTitle = ({ children }) => {
 
     chart.config.options.plugins.title.text = children;
     chart.config.options.plugins.title.display = true;
+
     chart.update();
 
   }, [chart, children]);
@@ -24,7 +25,7 @@ export const ChartTitle = ({ children }) => {
 
 export const ChartInstruction = () => {
   // Displays instruction for interacting with the chart when the info icon is hovered
-    const [showInstructions, setShowInstructions] = useState(false);
+    const [showInstructions, setShowInstructions] = useState(true);
     return (
       <div id="chart-instructions-container">
           <FontAwesomeIcon icon={faCircleInfo} onMouseEnter={() => setShowInstructions(true)} onMouseLeave={() => setShowInstructions(false)} />
