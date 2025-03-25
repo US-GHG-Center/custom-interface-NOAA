@@ -95,14 +95,14 @@ def extact_viz_json(filepath, dest_filepath, f):
 
             filename = f"noaa_glm_{measuring_instr}_{methodology}_{station}_{country}_{gas}_{time}.csv"
 
-            # filtered_df['site_country'] = site_country
-            # filtered_df['site_name'] = site_name
-            # filtered_df['site_elevation'] = site_elevation
-            # filtered_df['site_elevation_unit'] = site_elevation_unit
-            # filtered_df['station'] = station
+            filtered_df['site_country'] = site_country
+            filtered_df['site_name'] = site_name
+            filtered_df['site_elevation'] = site_elevation
+            filtered_df['site_elevation_unit'] = site_elevation_unit
+            #filtered_df['station'] = station
 
             try:
-                filtered_df[['datetime', 'value', 'latitude', 'longitude']].to_csv(dest_filepath+filename )
+                filtered_df[['datetime', 'value', 'latitude', 'longitude','site_country','site_name','site_elevation','site_elevation_unit']].to_csv(dest_filepath+filename )
             except Exception as e:
                 print("Error while saving:", e)
 
