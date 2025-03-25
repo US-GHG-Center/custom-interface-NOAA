@@ -4,8 +4,8 @@
     "extra_flags": [
         "-overwrite"
     ],
-    "filename_regex": ".*noaa_glm_flask_surface_ABP_Brazil_ch4_event.*",
-    "id_template": "cicd_{}",
+    "filename_regex": ".*geojson",
+    "id_template": "{}",
     "invalidate_cloudfront": true,
     "prefix": "NOAA_features_API/",
     "source_projection": "EPSG:4326",
