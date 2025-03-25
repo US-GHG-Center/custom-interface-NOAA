@@ -17,11 +17,6 @@ def ingest_features(dag_config_file):
     username = os.getenv("SM2A_ADMIN_USERNAME")
     password = os.getenv("SM2A_ADMIN_PASSWORD")
 
-    print("base_api_url", base_api_url)
-    print("vector_ingest_dag", vector_ingest_dag)
-    print("username", username)
-    print("password", password[:2])
-
     if not base_api_url or not username or not password:
         raise ValueError(
             "SM2A_API_URL, SM2A_ADMIN_USERNAME, or SM2A_ADMIN_PASSWORD is missing in environment variables."

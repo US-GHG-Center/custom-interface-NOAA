@@ -41,14 +41,13 @@ def daily_aggregate(filepath):
             dataframe = pd.read_csv(filepath)
         except Exception as e:
             print("error reading hourly file for daily agg: ", e)
-        aggregated_df = dataframe.groupby('datetime').agg(value = ("value", "mean"),
+        dataframe['tmp'] = pd.to_datetime(dataframe['datetime'])
+        dataframe["day"] = dataframe["tmp"].dt.date
+        aggregated_df = dataframe.groupby('day').agg(value = ("value", "mean"),
                                                         latitude=("latitude", "first"),
-                                                        longitude=("longitude", "first"),
-                                                        site_country=("site_country", "first"),
-                                                        site_name=("site_name","first"),
-                                                        site_elevation=("site_elevation","first"),
-                                                        site_elevation_unit=("site_elevation_unit","first")).reset_index()
-
+                                                        longitude=("longitude", "first")).reset_index()
+        aggregated_df['datetime'] = pd.to_datetime(aggregated_df['day']).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        aggregated_df = aggregated_df.drop(columns=['day'])
         filename = filepath.replace("hourly", "daily")
         print(f"Aggregating and writing daily file : {filename} ")
 
@@ -106,13 +105,9 @@ def monthly_aggregate(filepath):
         aggregated_df = dataframe.groupby(['year', 'month']).agg(value = ("value", "mean"),
                                                                 datetime = ("datetime", "mean"),
                                                                 latitude=("latitude", "first"),
-                                                                longitude=("longitude", "first"),
-                                                                site_country=("site_country", "first"),
-                                                                site_name=("site_name","first"),
-                                                                site_elevation=("site_elevation","first"),
-                                                                site_elevation_unit=("site_elevation_unit","first")).reset_index()
-        aggregated_df = aggregated_df[['datetime', 'value', 'latitude', 'longitude', 'site_country','site_name','site_elevation','site_elevation_unit']]
-        dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
+                                                                longitude=("longitude", "first")).reset_index()
+        aggregated_df = aggregated_df[['datetime', 'value', 'latitude', 'longitude']]
+        aggregated_df['datetime'] = pd.to_datetime(aggregated_df['datetime'])
         aggregated_df.sort_values(by='datetime')
         aggregated_df['datetime'] = aggregated_df['datetime'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         filename = filepath.replace("hourly", "monthly")
