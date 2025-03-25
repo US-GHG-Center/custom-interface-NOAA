@@ -7,7 +7,7 @@ from shapely.geometry import Point
 
 
 def process_csv_files():
-    excluded_sites = ["LAC", "INX", "BWD", "NEB", "NWB", "TMD", "SPF", "KLM", "MKO", "MLO", "HFM"]
+    excluded_sites = ["LAC", "INX", "BWD", "NEB", "NWB", "TMD", "SPF", "KLM", "HFM"] # removed "MKO", "MLO" from this list
     # Process all CSV files recursively
     df = pd.DataFrame(columns=['site_code', 'site_name', 'site_country','site_elevation','site_elevation_unit','latitude','longitude'])
     script_dir = os.path.dirname(os.path.realpath(__file__))
