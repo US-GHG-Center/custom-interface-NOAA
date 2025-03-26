@@ -68,9 +68,8 @@ export function dataTransformCollection(
     }
 
     const parts = collection.id.split(".")[1].split("_");
-    if (parts.length === 9) {
+    if (parts.length === 8) {
       const [
-        prefix,
         agency,
         product,
         measurement_inst,

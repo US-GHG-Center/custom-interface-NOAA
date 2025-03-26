@@ -10,7 +10,7 @@ import {
 
 
 const FEATURES_API_URL = process.env.REACT_APP_FEATURES_API_URL || '';
-const stationUrl = `${FEATURES_API_URL}/collections/public.station_metadata/items`;
+const stationUrl = `${FEATURES_API_URL}/collections/public.noaa_glm_station_metadata/items`;
 const collectionUrl = `${FEATURES_API_URL}/collections`;
 
 export function DashboardContainer() {
@@ -28,8 +28,7 @@ export function DashboardContainer() {
     searchParams.get('zoom-location') || []
   ); // let default zoom location be controlled by map component
   const [ selectedFrequency, setSelectedFrequency ] = useState(searchParams.get('frequency') || 'all'); // continuous or non-continuous
-  // const time_period = ['event', 'all', 'monthly', 'weekly'];
-  const time_period = ['monthly', 'event', 'weekly'];
+  const time_period = ['event', 'all', 'monthly', 'weekly', 'daily'];
 
   useEffect(() => {
     const fetchData = async () => {

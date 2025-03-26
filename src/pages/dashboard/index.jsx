@@ -5,6 +5,9 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { measurementLegend } from '../../constants';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMessage } from "@fortawesome/free-regular-svg-icons";
+
 import { 
   categorizeStations,
   getChartColor,
@@ -18,6 +21,9 @@ import { FrequencyDropdown } from '../../components/dropdown';
 import { Title } from '../../components/title';
 import { Legend } from '../../components/legend';
 
+import { nrtStations } from '../../nrt/station_meta';
+import { handleSpecialCases } from '../../nrt/helper';
+ 
 import {
   MainMap,
   MarkerFeature,
@@ -40,6 +46,7 @@ import styled from 'styled-components';
 import './index.css';
 
 const TITLE = 'NOAA: ESRL Global Monitoring Laboratory';
+const FEATURES_API_URL = process.env.REACT_APP_FEATURES_API_URL || '';
 
 const HorizontalLayout = styled.div`
   width: 90%;
@@ -69,20 +76,39 @@ export function Dashboard({
   const [dataAccessURL, setDataAccessURL] = useState('');
   const [legendData, setLegendData] = useState([]);
 
+  const [isNrtStation, setIsNrtStation] = useState(false);
+  const [nrtStationMeta, setNrtStationMeta] = useState(null);
+
+  // fetch nrt/station_meta.js and add station_codes to nrtStationCodes
+  const nrtStationCodes = [...new Set(nrtStations.map((station) => station.stationCode))];
+
+
+  useEffect(() => {
+    if (!isNrtStation)  return;
+
+    const selectedNrtStation = nrtStations.find(station => station.stationCode === selectedStationId);
+    setNrtStationMeta(selectedNrtStation || null); // Override with the current station or null if not found
+
+  }, [isNrtStation, selectedStationId]);
+  
 
   // handler functions
   const handleSelectedVizItem = (vizItemId) => {
-    if (vizItemId === selectedStationId) {
-      setDisplayChart(true);
+    if (nrtStationCodes.includes(vizItemId) && ghg === 'co2') {
+      setIsNrtStation(true);
     } else {
-      setSelectedStationId(vizItemId);
+      setIsNrtStation(false);
     }
+    setSelectedStationId(vizItemId);
   };
     
 
   const handleChartClose = () => {
-    setDisplayChart(false);   
+    setDisplayChart(false);
+    setSelectedStationId(null);
+    setIsNrtStation(false);
   }
+
 
   useEffect(() => {
     if (Array.isArray(vizItems)) {
@@ -142,6 +168,10 @@ export function Dashboard({
       }
     }
 
+    if (nrtStationMeta && (nrtStationMeta.stationCode === selectedStationId)) {
+      handleSpecialCases(stationData, isNrtStation, nrtStationMeta, setChartData);
+    }
+
     // Set data access URL
     setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
 
@@ -152,7 +182,7 @@ export function Dashboard({
   useEffect(() => {
     if (!stationData) return;
 
-    const categorizedData = categorizeStations(stationData, measurementLegend, selectedFrequency);
+    const categorizedData = categorizeStations(stationData, measurementLegend, selectedFrequency, ghg);
     setVizItems(categorizedData);
   }, [stationData, selectedFrequency]);
 
@@ -227,7 +257,18 @@ export function Dashboard({
                       <ChartInstruction />
                     </ChartToolsLeft>
                     <ChartToolsRight>
-                      <DataAccessTool dataAccessLink={dataAccessURL} />
+                      { isNrtStation && nrtStationMeta && 
+                        <DataAccessTool 
+                          dataAccessLink={nrtStationMeta.source}
+                          tooltip="Access NRT Dataset"
+                        />
+                      }
+                      { dataAccessURL &&
+                        <DataAccessTool 
+                          dataAccessLink={dataAccessURL} 
+                          tooltip="Access NOAA Dataset"
+                        />
+                      }
                       <ZoomResetTool />
                       <CloseButton handleClose={handleChartClose} />
                     </ChartToolsRight>
@@ -241,7 +282,6 @@ export function Dashboard({
                       'Chart' }
                     </ChartTitle>
                     {chartData.length > 0 && chartData.map((data, index) => (
-                      (
                         <LineChart
                           key={data.id}
                           data={data.value}
@@ -252,10 +292,19 @@ export function Dashboard({
                           index={index}
                           showLine={data.displayLine}
                           color={data.color}
-                        />)
+                        />
                 ))}
               </MainChart>
+              
             </Panel>
+            <div>
+            {isNrtStation && nrtStationMeta &&
+            <div className='nrt-station-note-container'>
+              <FontAwesomeIcon icon={faMessage} /> <b>Note</b>
+              <div className='nrt-station-note'>{nrtStationMeta.notice}</div>
+            </div>
+            }
+            </div>
           </>
         )}
       </PanelGroup>

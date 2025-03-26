@@ -2,6 +2,8 @@ import mockStationData from '../assets/dataset/stations';
 import { Station, CollectionItem } from '../dataModel/station';
 import { GreenhouseGas, InstrumentType, greenhouseGases, measurementInstruments, measurementLegend, timePeriodMapping } from '../constants';
 
+import { ignoreStations } from '../constants';
+
 interface CategorizedStation {
   color: string;
   stations: Array<Station & { categoryText: string }>;
@@ -14,11 +16,16 @@ export function getMockStationData(): Record<string, any> {
   return mockStationData;
 }
 
+function shouldIgnoreStation(stationKey: string, ghg: string): boolean {
+  // Check if the station is in the ignore list and the GHG matches
+  return ignoreStations.some(entry => entry.station === stationKey && entry.ghg === ghg);
+}
 
 export function categorizeStations(
   stationData: Record<string, Station>, 
   legendsDictionary: Record<string, any>,
-  dataFrequency: 'continuous' | 'non_continuous' | 'all'
+  dataFrequency: 'continuous' | 'non_continuous' | 'all',
+  ghg: string
 ): Array<Record<string, { stations: Record<string, Station>, color: string }>> {
   if (!stationData) return [];
 
@@ -26,6 +33,7 @@ export function categorizeStations(
 
   Object.entries(stationData).forEach(([stationKey, station]) => {
     if (!station.collection_items || station.collection_items.length === 0) return;
+    if (shouldIgnoreStation(stationKey, ghg)) return; // Skip the special station
 
     // Apply filter based on dataFrequency
     let filteredItems = station.collection_items;
@@ -81,16 +89,13 @@ export function getPopUpContent(station: Station): string {
 
   return `
     <b>${station.id}: ${station.meta.site_name}</b><br>
-    <b>${station.meta.site_country}</b><br>
+    ${station.meta.site_country ? `<b>${station.meta.site_country}</b><br>` : ""}
     Latitude: ${lat}<br>
     Longitude: ${lon}<br>
     Elevation: ${station.meta.site_elevation}<br>
     Measurement Type: ${uniqueMeasurements}
   `;
 }
-
-
-
 
 export function getChartColor(collectionItem: CollectionItem): string {
   const colors = [

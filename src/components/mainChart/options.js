@@ -59,7 +59,7 @@ export const options = {
         },
         font: {
           size: 24,
-          family: "Inter",
+          family: "Roboto",
           weight: "bold",
         },
         color: ghgBlue,

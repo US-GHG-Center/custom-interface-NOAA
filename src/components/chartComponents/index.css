@@ -1,0 +1,13 @@
+.data-access-tool {
+    color: #333;
+    text-decoration: none;
+}
+  
+/* Ensures the link color is the same whether clicked or not */
+.data-access-tool:visited {
+    color: #333;
+}
+  
+.data-access-tool:active {
+    color: #333;
+}

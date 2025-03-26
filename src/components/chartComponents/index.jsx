@@ -1,8 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark, faRotateLeft, faCircleInfo, faExternalLink } from '@fortawesome/free-solid-svg-icons';
+import { Tooltip } from "react-tooltip";
 import { useState, useEffect } from 'react';
 import { useChart } from '../../context/chartContext';
 
+import './index.css';
+import "react-tooltip/dist/react-tooltip.css";
+
+const tooltipStyle = {
+  backgroundColor: "rgba(255, 255, 255, 1)",
+  borderRadius: "8px",
+  color: "rgba(0, 0, 0, 0.8)",
+  padding: "8px",
+  fontSize: ".8rem",
+  boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2)",
+};
 
 export const ChartTitle = ({ children }) => {
   // Displays the title of the chart using the children prop
@@ -25,7 +37,7 @@ export const ChartTitle = ({ children }) => {
 
 export const ChartInstruction = () => {
   // Displays instruction for interacting with the chart when the info icon is hovered
-    const [showInstructions, setShowInstructions] = useState(true);
+    const [showInstructions, setShowInstructions] = useState(false);
     return (
       <div id="chart-instructions-container">
           <FontAwesomeIcon icon={faCircleInfo} onMouseEnter={() => setShowInstructions(true)} onMouseLeave={() => setShowInstructions(false)} />
@@ -52,12 +64,16 @@ export const ZoomResetTool = () => {
   };
 
   return (
+    <>
     <FontAwesomeIcon
       id="zoom-reset-button"
       icon={faRotateLeft}
-      title="Reset Zoom"
+      data-tooltip-id="close-chart-tooltip"
+      data-tooltip-content="Reset Chart Zoom"
       onClick={handleResetZoom}
     />
+    <Tooltip id="close-chart-tooltip" place="bottom" style={tooltipStyle}/>
+    </>
   );
 };
 
@@ -65,26 +81,35 @@ export const ZoomResetTool = () => {
 export const CloseButton = ({ handleClose }) => (
   // Closes the chart when the close icon is clicked
   // Receives the handleClose function as a prop
+  <>
   <FontAwesomeIcon
     id="chart-close-button"
     icon={faXmark}
-    title="Close"
+    data-tooltip-id="close-chart-tooltip"
+    data-tooltip-content="Close Chart"
     onClick={handleClose}
   />
+  <Tooltip id="close-chart-tooltip" place="bottom" style={tooltipStyle}/>
+  </>
 );
 
 
-export const DataAccessTool = ({ dataAccessLink }) => {
-  // Displays a link to the data access page when the data access link is provided
-
-  useEffect(() => {
-    if (!dataAccessLink) return;
-  }, [dataAccessLink]);
-
+export const DataAccessTool = ({ dataAccessLink, tooltip }) => {
   return (
-    <a id="data-access-link" href={dataAccessLink} target="_blank" rel="noreferrer">
-      <FontAwesomeIcon icon={faExternalLink} />
-    </a>
+    <>
+      <a
+        id="data-access-link"
+        href={dataAccessLink}
+        target="_blank"
+        rel="noreferrer"
+        data-tooltip-id="data-access-tooltip"
+        data-tooltip-content={tooltip}
+        class='data-access-tool'
+      >
+        <FontAwesomeIcon icon={faExternalLink} />
+      </a>
+      <Tooltip id="data-access-tooltip" place="bottom" style={tooltipStyle}/>
+    </>
   );
 };
   

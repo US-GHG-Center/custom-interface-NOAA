@@ -46,6 +46,7 @@ button.measure-icon {
   align-items: center;
   color: #000000;
 }
+
 button.change-unit {
   display: flex;
   font-size: medium;
@@ -53,6 +54,7 @@ button.change-unit {
   align-items: center;
   color: #000000;
 }
+
 button.clear-icon {
   display: flex;
   transform: rotate(90deg);
@@ -62,4 +64,22 @@ button.clear-icon {
 button.menu-open-icon {
   display: flex;
   align-items: center;
+}
+
+.nrt-station-note-container {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: #8251df;
+  font-size: .8rem;
+  z-index: 100000;
+}
+
+.nrt-station-note {
+  font-size: .8rem;
+  color: #222;
 }

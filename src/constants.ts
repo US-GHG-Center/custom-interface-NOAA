@@ -82,3 +82,8 @@ export const measurementLegend = {
         shortText: "Non-Continuous Measurements"
     },
 };
+
+// Ignore station for visualization
+export const ignoreStations = [
+    { station: "MKO", ghg: GreenhouseGas.CARBON_DIOXIDE }, // Ignore MKO if GHG is Co2
+];
