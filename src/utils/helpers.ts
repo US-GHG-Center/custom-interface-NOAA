@@ -9,7 +9,7 @@ interface CategorizedStation {
   stations: Array<Station & { categoryText: string }>;
 }
 
-// type CategorizedStations = Record<string, Record<string, CategorizedStation>>;
+type CategorizedStations = Record<string, Record<string, CategorizedStation>>;
 
 
 export function getMockStationData(): Record<string, any> {
@@ -52,7 +52,7 @@ export function categorizeStations(
 
     if (filteredItems.length === 0) return; // Skip stations with no valid collection items
 
-    // Determine station continuity based on filtered data
+    // Determine station frequency based on filtered data
     const isContinuous = filteredItems.some(item => 
       item.measurement_inst === "insitu" && 
       (item.methodology === "surface" || item.methodology === "tower")
@@ -96,6 +96,7 @@ export function getPopUpContent(station: Station): string {
     Measurement Type: ${uniqueMeasurements}
   `;
 }
+
 
 export function getChartColor(collectionItem: CollectionItem): string {
   const colors = [
@@ -162,6 +163,7 @@ export function getYAxisLabel(collectionItem: CollectionItem): string {
 
   return `${collectionItem.gas.toUpperCase()} Concentration (ppm)`;
 }
+
 
 export function getDataAccessURL(station: Station): string {
   const siteName = encodeURIComponent(station.id);

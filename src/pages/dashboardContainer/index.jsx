@@ -30,6 +30,8 @@ export function DashboardContainer() {
   const [ selectedFrequency, setSelectedFrequency ] = useState(searchParams.get('frequency') || 'all'); // continuous or non-continuous
   const time_period = ['event', 'all', 'monthly', 'weekly', 'daily'];
 
+
+  // fetch station date from Features API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,7 +55,8 @@ export function DashboardContainer() {
     fetchData();
   }, []);
 
-
+  // Fetch datetime and value associated with collection item whenever a station is selected
+  // This is done for all collection items of selected station
   useEffect(() => {
     const fetchCollectionItemValue = async () => {
       if (!selectedStationId || !stations) return;

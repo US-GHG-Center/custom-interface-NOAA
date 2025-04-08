@@ -71,25 +71,13 @@ export function Dashboard({
 }) {
   // states for data
   const [displayChart, setDisplayChart] = useState(false);
-  const [vizItems, setVizItems] = useState([]); // store all available visualization items
+  const [vizItems, setVizItems] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [dataAccessURL, setDataAccessURL] = useState('');
   const [legendData, setLegendData] = useState([]);
 
   const [isNrtStation, setIsNrtStation] = useState(false);
   const [nrtStationMeta, setNrtStationMeta] = useState(null);
-
-  // fetch nrt/station_meta.js and add station_codes to nrtStationCodes
-  const nrtStationCodes = [...new Set(nrtStations.map((station) => station.stationCode))];
-
-
-  useEffect(() => {
-    if (!isNrtStation)  return;
-
-    const selectedNrtStation = nrtStations.find(station => station.stationCode === selectedStationId);
-    setNrtStationMeta(selectedNrtStation || null); // Override with the current station or null if not found
-
-  }, [isNrtStation, selectedStationId]);
   
 
   // handler functions
@@ -102,14 +90,28 @@ export function Dashboard({
     setSelectedStationId(vizItemId);
   };
     
-
   const handleChartClose = () => {
     setDisplayChart(false);
     setSelectedStationId(null);
     setIsNrtStation(false);
   }
 
+  // Handle special case of NRT dataset
 
+  // fetch nrt/station_meta.js and add station_codes to nrtStationCodes
+  const nrtStationCodes = [...new Set(nrtStations.map((station) => station.stationCode))];
+
+  // update nrtStationMeta state if the station is NRT station
+  useEffect(() => {
+    if (!isNrtStation)  return;
+
+    const selectedNrtStation = nrtStations.find(station => station.stationCode === selectedStationId);
+    setNrtStationMeta(selectedNrtStation || null); // Override with the current station or null if not found
+
+  }, [isNrtStation, selectedStationId]);
+
+
+  // update legend based on the vizItems and selectedFrequency
   useEffect(() => {
     if (Array.isArray(vizItems)) {
       const newLegendData = vizItems
@@ -126,6 +128,7 @@ export function Dashboard({
   }, [vizItems, selectedFrequency]);
 
 
+  // update the chart data whenever selected station, data frequency or vizItems changes
   useEffect(() => {
     if (!selectedStationId || !vizItems) return;
     setDisplayChart(false);
@@ -134,13 +137,13 @@ export function Dashboard({
   
     let selectedCategory;
   
-    // First, check if the station exists in 'continuous' category
+    // First, check if the station exists in 'continuous' category and then non_continuous category
+    // This is because the Station is continous if it has both continous and non_continous values
     const continuousCategory = vizItems.find((item) => item['continuous']);
     if (continuousCategory && continuousCategory.continuous.stations[selectedStationId]) {
       selectedCategory = continuousCategory;
     }
 
-    // If not found in 'continuous', fallback to selectedFrequency category
     if (!selectedCategory) {
       selectedCategory = vizItems.find((item) => item['non_continuous']);
     }
@@ -179,6 +182,7 @@ export function Dashboard({
   }, [selectedStationId, vizItems, selectedFrequency]);
   
 
+  // set vizItems when stationData or data frequency changes
   useEffect(() => {
     if (!stationData) return;
 
@@ -186,7 +190,8 @@ export function Dashboard({
     setVizItems(categorizedData);
   }, [stationData, selectedFrequency]);
 
-  
+
+  // display chart when chartData is populated
   useEffect(() => {
     setDisplayChart(chartData.length > 0);
   }, [chartData]);
