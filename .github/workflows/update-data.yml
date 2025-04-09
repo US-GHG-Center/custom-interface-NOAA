@@ -109,16 +109,16 @@ jobs:
           pip install -r ./data_processing/ingestion/requirements.txt
           python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
     
-  ingest-data-staging:
+  # ingest-data-staging:
 
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    needs: preprocess-data
-    environment: staging 
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   needs: preprocess-data
+  #   environment: staging 
 
-    steps:
+  #   steps:
       - uses: actions/checkout@v4
 
       - name: Download processed data
@@ -157,51 +157,51 @@ jobs:
           pip install -r ./data_processing/ingestion/requirements.txt
           python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
     
-  # ingest-data-production:
+  ingest-data-production:
 
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   needs: preprocess-data
-  #   environment: production 
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    needs: preprocess-data
+    environment: production 
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Download processed data
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: processed-geojson
-  #         path: ./data/geojson
+      - name: Download processed data
+        uses: actions/download-artifact@v4
+        with:
+          name: processed-geojson
+          path: ./data/geojson
 
-  #     - name: ConfigureAWS Credentials 
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
-  #         role-session-name: ${{ github.repository_owner}}
-  #         aws-region: us-west-2
+      - name: ConfigureAWS Credentials 
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
+          role-session-name: ${{ github.repository_owner}}
+          aws-region: us-west-2
 
-  #     # Upload the transformed files to a s3 location and remove the folder after that
-  #     - name: Upload to S3
-  #       # only overwrites files that have changed, deletes file that exist in S3 but not locally
-  #       run: |
-  #         ls -l ./data/
-  #         aws s3 sync ./data/geojson s3://${{ vars.DEPLOYMENT_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+      # Upload the transformed files to a s3 location and remove the folder after that
+      - name: Upload to S3
+        # only overwrites files that have changed, deletes file that exist in S3 but not locally
+        run: |
+          ls -l ./data/
+          aws s3 sync ./data/geojson s3://${{ vars.DEPLOYMENT_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
 
-  #     - name : Remove local files
-  #       run: |
-  #         rm -rf ./data
+      - name : Remove local files
+        run: |
+          rm -rf ./data
 
-  #     - name: Ingest collections to Features API - prod
-  #       id: ingest-collections-prod
-  #       run: |
-  #         export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-  #         export SM2A_ADMIN_USERNAME="${{ secrets.SM2A_ADMIN_USERNAME }}"
-  #         export SM2A_ADMIN_PASSWORD="${{ secrets.SM2A_ADMIN_PASSWORD }}"
-  #         export SM2A_API_URL="${{ vars.SM2A_API_URL }}"
-  #         export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
+      - name: Ingest collections to Features API - prod
+        id: ingest-collections-prod
+        run: |
+          export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          export SM2A_ADMIN_USERNAME="${{ secrets.SM2A_ADMIN_USERNAME }}"
+          export SM2A_ADMIN_PASSWORD="${{ secrets.SM2A_ADMIN_PASSWORD }}"
+          export SM2A_API_URL="${{ vars.SM2A_API_URL }}"
+          export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
 
-  #         pip install -r ./data_processing/ingestion/requirements.txt
-  #         python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
+          pip install -r ./data_processing/ingestion/requirements.txt
+          python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
   
