@@ -146,16 +146,16 @@ jobs:
       #     rm -rf ./data
 
       # - name: Ingest collections to Features API - staging
-        id: ingest-collections-staging
-        run: |
-          export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          export SM2A_ADMIN_USERNAME="${{ secrets.SM2A_ADMIN_USERNAME }}"
-          export SM2A_ADMIN_PASSWORD="${{ secrets.SM2A_ADMIN_PASSWORD }}"
-          export SM2A_API_URL="${{ vars.SM2A_API_URL }}"
-          export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
+        # id: ingest-collections-staging
+        # # run: |
+        #   export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        #   export SM2A_ADMIN_USERNAME="${{ secrets.SM2A_ADMIN_USERNAME }}"
+        #   export SM2A_ADMIN_PASSWORD="${{ secrets.SM2A_ADMIN_PASSWORD }}"
+        #   export SM2A_API_URL="${{ vars.SM2A_API_URL }}"
+        #   export DATASET_DAG_NAME="${{ vars.DATASET_DAG_NAME }}"
 
-          pip install -r ./data_processing/ingestion/requirements.txt
-          python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
+        #   pip install -r ./data_processing/ingestion/requirements.txt
+        #   python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
     
   # ingest-data-production:
 
