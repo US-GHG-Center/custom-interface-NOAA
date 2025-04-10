@@ -157,7 +157,7 @@ jobs:
           pip install -r ./data_processing/ingestion/requirements.txt
           python3 ./data_processing/ingestion/ingest_collection.py ./data_processing/ingestion/NOAA-dag-config.json
     
-  ingest-data-production:
+  # ingest-data-production:
 
     runs-on: ubuntu-latest
     permissions:
