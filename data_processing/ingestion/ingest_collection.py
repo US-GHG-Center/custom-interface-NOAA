@@ -74,6 +74,7 @@ def ingest_features(dag_config_file):
         raise RuntimeError(f"Failed to trigger DAG: {response_json}")
 
     print(f"DAG triggered successfully with run_id: {dag_run_id}")
+    print(f"Check status of your dag at {sm2a.dev.ghg.center}/dags/{vector_ingest_dag}/grid?dag_run_id={dag_run_id}")
 
     # Check status until completion
     dag_state = check_dag_status(vector_ingest_dag, dag_run_id, http_conn, headers)
