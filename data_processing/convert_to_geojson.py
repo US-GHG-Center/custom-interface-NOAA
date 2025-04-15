@@ -7,6 +7,16 @@ from shapely.geometry import Point
 
 # Custom function to convert GeoDataFrame to GeoJSON
 def gdf_to_geojson(gdf):
+    """
+    Converts a GeoDataFrame into a GeoJSON FeatureCollection.
+
+    Parameters:
+        gdf (geopandas.GeoDataFrame): A GeoDataFrame containing 'datetime', 'value', 'latitude', and 'longitude' fields.
+
+    Returns:
+        dict: A GeoJSON FeatureCollection with point geometries and associated properties.
+    """
+
     features = []
     for _, row in gdf.iterrows():
         feature = {
@@ -32,10 +42,32 @@ def gdf_to_geojson(gdf):
     return geojson
 
 def check_if_excluded(site_name):
+    """
+    Checks if a given site code is in the list of excluded sites.
+
+    Parameters:
+        site_name (str): The site code to check.
+
+    Returns:
+        bool: True if the site is excluded, False otherwise.
+    """
+
     excluded_sites = ["LAC", "INX", "BWD", "NEB", "NWB", "TMD", "SPF", "KLM", "HFM"] # removed "MKO", "MLO" from this list
     return  (site_name.lower() in excluded_sites) or (site_name.upper() in excluded_sites)
 
 def process_csv_files():
+    """
+    Processes all CSV files in the '../data/processed/' directory, excluding certain site codes.
+    
+    For each included file:
+      - Reads the CSV
+      - Constructs a GeoDataFrame
+      - Converts it to a GeoJSON format
+      - Saves the GeoJSON to a mirrored path under '../data/geojson/'
+    
+    Prints progress and skips excluded sites.
+    """
+
     # Process all CSV files recursively
     script_dir = os.path.dirname(os.path.realpath(__file__))
     print("Total files to be converted to geojson: ", len(glob.glob(os.path.join(script_dir, "../data/processed/**/*.csv"), recursive=True)))
@@ -72,6 +104,10 @@ def process_csv_files():
 
 # Main function
 def main():
+    """
+    Entry point for the script. Calls the CSV-to-GeoJSON processing function.
+    """
+
     process_csv_files()
 
 # Entry point

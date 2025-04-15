@@ -6,14 +6,10 @@ import pandas as pd
 
 def daily_aggregate(filepath):
     """
-    Reads hourly data from a .txt file, aggregates it to daily, and returns a list of JSON objects that can be readily visualized in chart.
+    Reads hourly data from a .txt file, aggregates it to daily, and writes that to a csv file.
 
     Parameters:
         filepath (str): The path to the file containing the data to be aggregated.
-
-    Returns:
-        list: A list of dictionaries representing aggregated data, with each dictionary containing
-              'date' and 'value' keys.
 
     Description:
         This function reads data from the specified file, aggregates it, and returns a list of JSON objects.
@@ -22,16 +18,11 @@ def daily_aggregate(filepath):
         - Extracts the header lines from the file to determine the structure of the data.
         - Processes the data into a DataFrame.
         - Filters and aggregates the data.
-        - Converts the aggregated data into a list of JSON objects, where each object contains 'date' and 'value' keys.
+        - Saves to csv file.
 
     Exceptions:
         - FileNotFoundError: If the specified file is not found.
         - Exception: If any other exception occurs during the processing, the exception message is returned.
-
-    Note:
-        - The input file is expected to have a .txt format with header lines indicating the structure of the data.
-        - The function aggregates data from hourly to daily intervals.
-        - The returned JSON list is suitable for use in frontend applications to visualize the aggregated data.
 
     Example:
         aggregated_data = daily_aggregate("/path/to/data_file.txt")
@@ -68,14 +59,10 @@ def daily_aggregate(filepath):
 
 def monthly_aggregate(filepath):
     """
-    Reads hourly data from a .txt file, aggregates it to monthly, and returns a list of JSON objects that can be readily visualized in chart.
+    Reads hourly data from a .txt file, aggregates it to monthly, and and writes that to a csv file.
 
     Parameters:
         filepath (str): The path to the file containing the data to be aggregated.
-
-    Returns:
-        list: A list of dictionaries representing aggregated data, with each dictionary containing
-              'date' and 'value' keys.
 
     Description:
         This function reads data from the specified file, aggregates it, and returns a list of JSON objects.
@@ -84,16 +71,11 @@ def monthly_aggregate(filepath):
         - Extracts the header lines from the file to determine the structure of the data.
         - Processes the data into a DataFrame.
         - Filters and aggregates the data.
-        - Converts the aggregated data into a list of JSON objects, where each object contains 'date' and 'value' keys.
+        - Writes that to a csv file.
 
     Exceptions:
         - FileNotFoundError: If the specified file is not found.
         - Exception: If any other exception occurs during the processing, the exception message is returned.
-
-    Note:
-        - The input file is expected to have a .txt format with header lines indicating the structure of the data.
-        - The function aggregates data from hourly to daily intervals.
-        - The returned JSON list is suitable for use in frontend applications to visualize the aggregated data.
 
     Example:
         aggregated_data = monthly_aggregate("/path/to/data_file.txt")

@@ -7,6 +7,20 @@ from shapely.geometry import Point
 
 
 def process_csv_files():
+     """
+    Processes all CSV files under the `../data/processed/` directory to extract site metadata,
+    filters out excluded sites, and generates a GeoJSON file containing metadata for all valid sites.
+
+    The metadata extracted includes:
+        - Site code, name, country
+        - Site elevation and its unit
+        - Latitude and longitude
+        - Methodology, gas type, and instrument (for record keeping, although not saved in final GeoJSON)
+
+    Excluded site codes are specified in `excluded_sites`. The resulting GeoJSON is saved as:
+        ../data/geojson/noaa_glm_station_metadata.geojson
+    """
+
     excluded_sites = ["LAC", "INX", "BWD", "NEB", "NWB", "TMD", "SPF", "KLM", "HFM"] # removed "MKO", "MLO" from this list
     # Process all CSV files recursively
     df = pd.DataFrame(columns=['site_code', 'site_name', 'site_country','site_elevation','site_elevation_unit','latitude','longitude'])
@@ -58,15 +72,13 @@ def process_csv_files():
 
 # Main function
 def main():
+    """
+    Entry point for script execution. Triggers the processing of CSV files into GeoJSON.
+    """
     process_csv_files()
 
 # Entry point
 if __name__ == "__main__":
     main()
-
-
-
-
-
 
 

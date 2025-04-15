@@ -24,7 +24,7 @@ def extact_viz_json(filepath, dest_filepath, f):
         filepath (str): The path to the file containing the data to be converted.
 
     Description:
-        This function reads data from a .txt file, and returns a list of JSON objects.
+        This function reads data from a .txt file, and returns a writes into a csv file.
         The function performs the following steps:
         - Reads the content of the file.
         - Extracts the header lines from the file to determine the structure of the data.

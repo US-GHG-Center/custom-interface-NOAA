@@ -7,7 +7,7 @@ from utils import get_insitu_filename_wo_daily_data, get_insitu_filename_wo_mont
 
 def main():
     """
-    Processes data from various source directories and converts them to  JSON format.
+    Processes data from various source directories and converts them to  CSV.
     Raw insitu data is converted to processed data with specific directories for GHG (Green House Gases).
 
     This function performs the following tasks:
@@ -181,6 +181,13 @@ def json_filename(filename):
     return ".".join(splitted_filename)
 
 def get_summary(data_src_dirs, data_dest_dirs):
+    """
+    Generates a summary table of the files processed in he console.
+
+    Args:
+        data_src_dirs (list): list of the raw data dirs.
+        data_dest_dirs (list): list of the processed data dirs.
+    """
 
     print("SUMMARY: \n")
 
