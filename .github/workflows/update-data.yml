@@ -144,7 +144,7 @@ jobs:
 
       - name: Ingest collections to Features API - staging
         id: ingest-collections-staging
-        # run: |
+        run: |
           export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
           export SM2A_ADMIN_USERNAME="${{ secrets.SM2A_ADMIN_USERNAME }}"
           export SM2A_ADMIN_PASSWORD="${{ secrets.SM2A_ADMIN_PASSWORD }}"
