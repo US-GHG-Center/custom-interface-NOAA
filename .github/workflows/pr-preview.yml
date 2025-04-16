@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  S3_BUCKET: ${{ vars.DEPLOYMENT_BUCKET }}
+  S3_BUCKET: ${{ vars.DEPLOYMENT_BUCKET_REACT }}
   PR_STRING: pr-preview-${{ github.event.number }}
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
           [ -z "${{ secrets.REACT_APP_MAPBOX_STYLE_URL }}" ] && missing_vars+=("secrets.REACT_APP_MAPBOX_STYLE_URL")
           [ -z "${{ vars.PUBLIC_URL }}" ] && missing_vars+=("vars.PUBLIC_URL")
           # note: vars.PUBLIC_URL is expected to have leading and trailing /
-          [ -z "${{ vars.DEPLOYMENT_BUCKET }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET")
+          [ -z "${{ vars.DEPLOYMENT_BUCKET_REACT }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET_REACT")
           [ -z "${{ vars.DEPLOYMENT_REGION }}" ] && missing_vars+=("vars.DEPLOYMENT_REGION")
           [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN")
           [ -z "${{ secrets.CF_DISTRIBUTION_ID }}" ] && missing_vars+=("secrets.CF_DISTRIBUTION_ID")
