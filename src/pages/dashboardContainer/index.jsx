@@ -44,6 +44,8 @@ export function DashboardContainer() {
         const collectionApiResponse = await fetchAllFromFeaturesAPI(collectionUrl);
         dataTransformCollection(collectionApiResponse, transformedStationData, agency, ghg, time_period);
 
+        // todo: avoide mutation on data
+
         setStations(transformedStationData);
       } catch (error) {
         console.error('Error fetching data:', error);

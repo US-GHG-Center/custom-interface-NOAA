@@ -163,6 +163,7 @@ export function Dashboard({
               legend: getChartLegend(item),
               labelX: 'Observation Date/Time (UTC)',
               labelY: getYAxisLabel(item),
+              // todo: rename it to connect points
               displayLine: item.time_period === 'monthly' || item.time_period === 'yearly',
             });
           }
@@ -219,7 +220,7 @@ export function Dashboard({
                 {vizItems.map((item) => {
                   const [category, data] = Object.entries(item)[0];
 
-                  // Conditionally render Marke based on selectedFrequency
+                  // Conditionally render Marker based on selectedFrequency
                   if (selectedFrequency === "all" || selectedFrequency === category) {
                     return (
                       <MarkerFeature
