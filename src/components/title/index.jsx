@@ -8,7 +8,7 @@ export const Title = ({ title, frequency, ghg }) => {
       <Typography
         component='div'
         className='title-text'
-        sx={{ 
+        sx={{
           fontWeight: 'bold',
         }}
       >

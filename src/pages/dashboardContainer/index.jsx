@@ -19,15 +19,15 @@ export function DashboardContainer() {
   const [loading, setLoading] = useState(true);
 
   // get the query params
-  const [ searchParams, setSearchParams ] = useSearchParams();
-  const [ agency ] = useState(searchParams.get('agency') || 'noaa'); // nist, noaa, or nasa
-  const [ ghg, setSelectedGHG ] = useState(searchParams.get('ghg') || 'co2'); // co2 or ch4
-  const [ stationCode ] = useState(searchParams.get('station-code') || ''); // buc, smt, etc
-  const [ zoomLevel, setZoomLevel ] = useState (searchParams.get('zoom-level')); // let default zoom level controlled by map component
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [agency] = useState(searchParams.get('agency') || 'noaa'); // nist, noaa, or nasa
+  const [ghg, setSelectedGHG] = useState(searchParams.get('ghg') || 'co2'); // co2 or ch4
+  const [stationCode] = useState(searchParams.get('station-code') || ''); // buc, smt, etc
+  const [zoomLevel, setZoomLevel] = useState(searchParams.get('zoom-level')); // let default zoom level controlled by map component
   const [zoomLocation, setZoomLocation] = useState(
     searchParams.get('zoom-location') || []
   ); // let default zoom location be controlled by map component
-  const [ selectedFrequency, setSelectedFrequency ] = useState(searchParams.get('frequency') || 'all'); // continuous or non-continuous
+  const [selectedFrequency, setSelectedFrequency] = useState(searchParams.get('frequency') || 'all'); // continuous or non-continuous
   const time_period = ['event', 'all', 'monthly', 'weekly', 'daily'];
 
 
@@ -62,16 +62,16 @@ export function DashboardContainer() {
   useEffect(() => {
     const fetchCollectionItemValue = async () => {
       if (!selectedStationId || !stations) return;
-  
+
       const selectedStation = stations[selectedStationId];
       if (!selectedStation?.collection_items) return;
-      
-  
+
+
       // Create a deep copy of stations to avoid mutation
       const updatedstations = { ...stations };
       const updatedStation = { ...updatedstations[selectedStationId] };
       updatedstations[selectedStationId] = updatedStation;
-    
+
       try {
         setLoading(true);
         // Fetch missing datetime and values in parallel
@@ -82,7 +82,7 @@ export function DashboardContainer() {
                 const response = await fetchAllFromFeaturesAPI(
                   `${FEATURES_API_URL}/collections/${item.id}/items`
                 );
-  
+
                 if (response.length > 0) {
                   item.datetime = response[0].properties.datetime;
                   item.value = response[0].properties.value;
@@ -94,7 +94,7 @@ export function DashboardContainer() {
             }
           })
         );
-  
+
         // Update station data and chart data
         setStations(updatedstations);
       } catch (error) {
@@ -103,7 +103,7 @@ export function DashboardContainer() {
         setLoading(false);
       }
     };
-  
+
     fetchCollectionItemValue();
   }, [selectedStationId]);
 

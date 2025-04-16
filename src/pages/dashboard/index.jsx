@@ -8,7 +8,7 @@ import { measurementLegend } from '../../constants';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 
-import { 
+import {
   categorizeStations,
   getChartColor,
   getChartLegend,
@@ -23,7 +23,7 @@ import { Legend } from '../../components/legend';
 
 import { nrtStations } from '../../nrt/station_meta';
 import { handleSpecialCases } from '../../nrt/helper';
- 
+
 import {
   MainMap,
   MarkerFeature,
@@ -78,7 +78,7 @@ export function Dashboard({
 
   const [isNrtStation, setIsNrtStation] = useState(false);
   const [nrtStationMeta, setNrtStationMeta] = useState(null);
-  
+
 
   // handler functions
   const handleSelectedVizItem = (vizItemId) => {
@@ -89,7 +89,7 @@ export function Dashboard({
     }
     setSelectedStationId(vizItemId);
   };
-    
+
   const handleChartClose = () => {
     setDisplayChart(false);
     setSelectedStationId(null);
@@ -103,7 +103,7 @@ export function Dashboard({
 
   // update nrtStationMeta state if the station is NRT station
   useEffect(() => {
-    if (!isNrtStation)  return;
+    if (!isNrtStation) return;
 
     const selectedNrtStation = nrtStations.find(station => station.stationCode === selectedStationId);
     setNrtStationMeta(selectedNrtStation || null); // Override with the current station or null if not found
@@ -134,9 +134,9 @@ export function Dashboard({
     setDisplayChart(false);
     setLoadingData(true);
     setChartData([]);
-  
+
     let selectedCategory;
-  
+
     // First, check if the station exists in 'continuous' category and then non_continuous category
     // This is because the Station is continous if it has both continous and non_continous values
     const continuousCategory = vizItems.find((item) => item['continuous']);
@@ -147,7 +147,7 @@ export function Dashboard({
     if (!selectedCategory) {
       selectedCategory = vizItems.find((item) => item['non_continuous']);
     }
-      
+
     if (selectedCategory) {
       const categoryKey = Object.keys(selectedCategory)[0]; // Extract category name
       const selectedStation = selectedCategory[categoryKey].stations[selectedStationId];
@@ -181,7 +181,7 @@ export function Dashboard({
 
     setLoadingData(false);
   }, [selectedStationId, vizItems, selectedFrequency]);
-  
+
 
   // set vizItems when stationData or data frequency changes
   useEffect(() => {
@@ -197,7 +197,7 @@ export function Dashboard({
     setDisplayChart(chartData.length > 0);
   }, [chartData]);
 
-  
+
   return (
     <Box className='fullSize'>
       <PanelGroup direction='vertical' className='panel-wrapper'>
@@ -210,37 +210,37 @@ export function Dashboard({
           order={1}
         >
           <div id='dashboard-map-container'>
-              <MainMap>
-                <Paper className='title-wrapper' sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-                  <Title title={TITLE} ghg={ghg} frequency={selectedFrequency} />
-                </Paper>
-                <img src={process.env.PUBLIC_URL + "/noaa-logo.png"} alt="NOAA" className='logo'/>
+            <MainMap>
+              <Paper className='title-wrapper' sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                <Title title={TITLE} ghg={ghg} frequency={selectedFrequency} />
+              </Paper>
+              <img src={process.env.PUBLIC_URL + "/noaa-logo.png"} alt="NOAA" className='logo' />
 
-                <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
-                {vizItems.map((item) => {
-                  const [category, data] = Object.entries(item)[0];
+              <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
+              {vizItems.map((item) => {
+                const [category, data] = Object.entries(item)[0];
 
-                  // Conditionally render Marker based on selectedFrequency
-                  if (selectedFrequency === "all" || selectedFrequency === category) {
-                    return (
-                      <MarkerFeature
-                        key={category}
-                        vizItems={Object.values(data.stations)}
-                        onSelectVizItem={handleSelectedVizItem}
-                        markerColor={data.color}
-                        getPopupContent={getPopUpContent}
-                      />
-                    );
-                  }
+                // Conditionally render Marker based on selectedFrequency
+                if (selectedFrequency === "all" || selectedFrequency === category) {
+                  return (
+                    <MarkerFeature
+                      key={category}
+                      vizItems={Object.values(data.stations)}
+                      onSelectVizItem={handleSelectedVizItem}
+                      markerColor={data.color}
+                      getPopupContent={getPopUpContent}
+                    />
+                  );
+                }
 
-                  return null; // Ensure nothing is rendered if conditions don't match
-                })}
-                <FrequencyDropdown
-                  selectedValue={selectedFrequency}
-                  setSelectedValue={setSelectedFrequency}
-                />
-                <Legend legendData={legendData} />
-              </MainMap>
+                return null; // Ensure nothing is rendered if conditions don't match
+              })}
+              <FrequencyDropdown
+                selectedValue={selectedFrequency}
+                setSelectedValue={setSelectedFrequency}
+              />
+              <Legend legendData={legendData} />
+            </MainMap>
           </div>
         </Panel>
         {displayChart && (
@@ -257,59 +257,59 @@ export function Dashboard({
               order={2}
             >
               <MainChart>
-                  {/* Instructions and Tools container */}
-                  <ChartTools>
-                    <ChartToolsLeft>
-                      <ChartInstruction />
-                    </ChartToolsLeft>
-                    <ChartToolsRight>
-                      { isNrtStation && nrtStationMeta && 
-                        <DataAccessTool 
-                          dataAccessLink={nrtStationMeta.source}
-                          tooltip="Access NRT Dataset"
-                        />
-                      }
-                      { dataAccessURL &&
-                        <DataAccessTool 
-                          dataAccessLink={dataAccessURL} 
-                          tooltip="Access NOAA Dataset"
-                        />
-                      }
-                      <ZoomResetTool />
-                      <CloseButton handleClose={handleChartClose} />
-                    </ChartToolsRight>
-                  </ChartTools>
+                {/* Instructions and Tools container */}
+                <ChartTools>
+                  <ChartToolsLeft>
+                    <ChartInstruction />
+                  </ChartToolsLeft>
+                  <ChartToolsRight>
+                    {isNrtStation && nrtStationMeta &&
+                      <DataAccessTool
+                        dataAccessLink={nrtStationMeta.source}
+                        tooltip="Access NRT Dataset"
+                      />
+                    }
+                    {dataAccessURL &&
+                      <DataAccessTool
+                        dataAccessLink={dataAccessURL}
+                        tooltip="Access NOAA Dataset"
+                      />
+                    }
+                    <ZoomResetTool />
+                    <CloseButton handleClose={handleChartClose} />
+                  </ChartToolsRight>
+                </ChartTools>
 
 
-                  {/* Main chart container */}
-                    <ChartTitle>{ 
-                      selectedStationId? 
-                      stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')'  : 
-                      'Chart' }
-                    </ChartTitle>
-                    {chartData.length > 0 && chartData.map((data, index) => (
-                        <LineChart
-                          key={data.id}
-                          data={data.value}
-                          labels={data.label}
-                          legend={data.legend}
-                          labelX={data.labelX}
-                          labelY={data.labelY}
-                          index={index}
-                          showLine={data.displayLine}
-                          color={data.color}
-                        />
+                {/* Main chart container */}
+                <ChartTitle>{
+                  selectedStationId ?
+                    stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')' :
+                    'Chart'}
+                </ChartTitle>
+                {chartData.length > 0 && chartData.map((data, index) => (
+                  <LineChart
+                    key={data.id}
+                    data={data.value}
+                    labels={data.label}
+                    legend={data.legend}
+                    labelX={data.labelX}
+                    labelY={data.labelY}
+                    index={index}
+                    showLine={data.displayLine}
+                    color={data.color}
+                  />
                 ))}
               </MainChart>
-              
+
             </Panel>
             <div>
-            {isNrtStation && nrtStationMeta &&
-            <div className='nrt-station-note-container'>
-              <FontAwesomeIcon icon={faMessage} /> <b>Note</b>
-              <div className='nrt-station-note'>{nrtStationMeta.notice}</div>
-            </div>
-            }
+              {isNrtStation && nrtStationMeta &&
+                <div className='nrt-station-note-container'>
+                  <FontAwesomeIcon icon={faMessage} /> <b>Note</b>
+                  <div className='nrt-station-note'>{nrtStationMeta.notice}</div>
+                </div>
+              }
             </div>
           </>
         )}

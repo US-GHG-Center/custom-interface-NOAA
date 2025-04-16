@@ -15,27 +15,27 @@ const getMarkerSVG = (color, strokeColor = '#000000') => {
 };
 
 export const Legend = ({ legendData }) => {
-    return (
-      <Box className="legend-container">
-        <Typography variant="h6" className="legend-title" sx={{
-                fontWeight: 'bold',
-                marginBottom: '4px',
-                fontSize: '16px'
-            }}
-        >
-          Legend
-        </Typography>
-        <Divider className="legend-divider" sx={{ marginBottom: '10px' }}/>
-        {legendData.map((item, index) => (
-          <Box key={index} className="legend-item">
-            <Box className="legend-marker">
-              {getMarkerSVG(item.color)}
-            </Box>
-            <Typography variant="body2" className="legend-text" sx={{ fontSize: '14px' }}>
-              {item.text}
-            </Typography>
+  return (
+    <Box className="legend-container">
+      <Typography variant="h6" className="legend-title" sx={{
+        fontWeight: 'bold',
+        marginBottom: '4px',
+        fontSize: '16px'
+      }}
+      >
+        Legend
+      </Typography>
+      <Divider className="legend-divider" sx={{ marginBottom: '10px' }} />
+      {legendData.map((item, index) => (
+        <Box key={index} className="legend-item">
+          <Box className="legend-marker">
+            {getMarkerSVG(item.color)}
           </Box>
-        ))}
-      </Box>
-    );
-  };
+          <Typography variant="body2" className="legend-text" sx={{ fontSize: '14px' }}>
+            {item.text}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  );
+};

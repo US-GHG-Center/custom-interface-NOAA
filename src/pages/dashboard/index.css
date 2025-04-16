@@ -36,6 +36,7 @@
   color: #082a63;
   z-index: 1000;
 }
+
 .map-icon {
   color: #ffffff;
 }
@@ -61,6 +62,7 @@ button.clear-icon {
   align-items: center;
   color: #000000;
 }
+
 button.menu-open-icon {
   display: flex;
   align-items: center;

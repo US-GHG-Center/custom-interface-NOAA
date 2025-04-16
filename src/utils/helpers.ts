@@ -22,7 +22,7 @@ function shouldIgnoreStation(stationKey: string, ghg: string): boolean {
 }
 
 export function categorizeStations(
-  stationData: Record<string, Station>, 
+  stationData: Record<string, Station>,
   legendsDictionary: Record<string, any>,
   dataFrequency: 'continuous' | 'non_continuous' | 'all',
   ghg: string
@@ -46,15 +46,15 @@ export function categorizeStations(
     } else if (dataFrequency === 'non_continuous') {
       filteredItems = filteredItems.filter(item =>
         !(item.measurement_inst === "insitu" &&
-        (item.methodology === "surface" || item.methodology === "tower"))
+          (item.methodology === "surface" || item.methodology === "tower"))
       );
     }
 
     if (filteredItems.length === 0) return; // Skip stations with no valid collection items
 
     // Determine station frequency based on filtered data
-    const isContinuous = filteredItems.some(item => 
-      item.measurement_inst === "insitu" && 
+    const isContinuous = filteredItems.some(item =>
+      item.measurement_inst === "insitu" &&
       (item.methodology === "surface" || item.methodology === "tower")
     );
 
@@ -116,12 +116,12 @@ export function getChartColor(collectionItem: CollectionItem): string {
     'rgba(0, 100, 0, 1)',
     'rgba(139, 0, 0, 1)',
   ];
-  
+
   const colorMapping: Record<string, string> = {};
   const gases = ['co2', 'ch4'];
   const timePeriods = ['daily', 'hourly', 'weekly', 'monthly', 'yearly', 'event'];
   const instruments = ['insitu', 'pfp', 'flask'];
-  
+
   let index = 0;
   for (const gas of gases) {
     for (const timePeriod of timePeriods) {
@@ -145,9 +145,9 @@ export function getChartLegend(collectionItem: CollectionItem): string {
   const instrumentKey = collectionItem.measurement_inst.toLowerCase() as InstrumentType;
   const instrumentInfo = measurementInstruments[instrumentKey] || { fullName: collectionItem.measurement_inst };
 
-  const timePeriod = collectionItem.time_period && collectionItem.time_period !== 'event' 
+  const timePeriod = collectionItem.time_period && collectionItem.time_period !== 'event'
     ? `${timePeriodMapping[collectionItem.time_period] || collectionItem.time_period} `
-  : '';
+    : '';
 
   return `Observed ${gasInfo.short} Concentration (${timePeriod}${instrumentInfo.fullName})`;
 }
@@ -168,9 +168,9 @@ export function getYAxisLabel(collectionItem: CollectionItem): string {
 export function getDataAccessURL(station: Station): string {
   const siteName = encodeURIComponent(station.id);
   const gasKey = station.collection_items?.[0]?.gas as GreenhouseGas | undefined;
-  
-  let parameterName = gasKey && greenhouseGases[gasKey] 
-    ? encodeURIComponent(greenhouseGases[gasKey].fullName) 
+
+  let parameterName = gasKey && greenhouseGases[gasKey]
+    ? encodeURIComponent(greenhouseGases[gasKey].fullName)
     : '';
 
   parameterName = parameterName.replace(/%20/g, '%2B');

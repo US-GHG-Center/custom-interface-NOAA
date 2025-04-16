@@ -15,8 +15,10 @@ export { VisualizationLayers } from './map/mapLayer';
 // Chart Components
 export { MainChart } from './mainChart/index.jsx';
 export { LineChart } from './lineChart/index.jsx';
-export { ChartInstruction, ChartTools, ChartToolsLeft, ChartToolsRight,
-  ChartTitle, DataAccessTool, ZoomResetTool, CloseButton } from './chartComponents';
+export {
+  ChartInstruction, ChartTools, ChartToolsLeft, ChartToolsRight,
+  ChartTitle, DataAccessTool, ZoomResetTool, CloseButton
+} from './chartComponents';
 
 // Method Components
 export { FilterByDate } from './method/filter';

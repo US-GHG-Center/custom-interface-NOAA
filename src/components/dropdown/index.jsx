@@ -7,7 +7,7 @@ import { DataFrequency, measurementLegend } from '../../constants';
 import "./index.css";
 import { Menu } from '@mui/material';
 
-export function FrequencyDropdown({ selectedValue, setSelectedValue, style}) {
+export function FrequencyDropdown({ selectedValue, setSelectedValue, style }) {
   const handleChange = (event) => {
     setSelectedValue(event.target.value);
   };
