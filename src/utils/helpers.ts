@@ -1,4 +1,3 @@
-import mockStationData from '../assets/dataset/stations';
 import { Station, CollectionItem } from '../dataModel/station';
 import { GreenhouseGas, InstrumentType, greenhouseGases, measurementInstruments, measurementLegend, timePeriodMapping } from '../constants';
 
@@ -11,10 +10,6 @@ interface CategorizedStation {
 
 type CategorizedStations = Record<string, Record<string, CategorizedStation>>;
 
-
-export function getMockStationData(): Record<string, any> {
-  return mockStationData;
-}
 
 function shouldIgnoreStation(stationKey: string, ghg: string): boolean {
   // Check if the station is in the ignore list and the GHG matches
