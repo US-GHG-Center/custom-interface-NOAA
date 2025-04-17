@@ -1,7 +1,8 @@
 import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
-import { plugin } from '../components/mainChart/customPlugin';
+import 'chartjs-adapter-luxon';
 import { options } from '../components/mainChart/options';
+import { plugin } from '../components/mainChart/customPlugin';
 import '../components/mainChart/config';
 
 const ChartContext = createContext();
@@ -11,7 +12,7 @@ export const ChartProvider = ({ children }) => {
   const [chart, setChart] = useState(null);
 
   useEffect(() => {
-    if (chart) return;
+    if (chart || !chartContainer) return;
 
     let dataset = {
       labels: [],
