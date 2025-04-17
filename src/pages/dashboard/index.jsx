@@ -243,7 +243,7 @@ export function Dashboard({
             </MainMap>
           </div>
         </Panel>
-        {true && (
+        {displayChart && (
           <>
             <PanelResizeHandle className='resize-handle'>
               <DragHandleIcon title='Resize' />

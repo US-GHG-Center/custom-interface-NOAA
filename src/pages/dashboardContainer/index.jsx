@@ -36,6 +36,7 @@ export function DashboardContainer() {
     const fetchData = async () => {
       try {
         // Fetch and transform station metadata
+        console.log('Station URL-->', stationUrl);
         const stationApiResponse = await fetchAllFromFeaturesAPI(stationUrl);
         const transformedStationData = dataTransformationStation(stationApiResponse);
         // setStations(transformedStationData);
