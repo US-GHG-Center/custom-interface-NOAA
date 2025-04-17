@@ -10,37 +10,64 @@ const ChartContext = createContext();
 export const ChartProvider = ({ children }) => {
   const chartContainer = useRef(null);
   const [chart, setChart] = useState(null);
+  const [isReady, setIsReady] = useState(false);
 
+  // Observer to wait until canvas is visible
   useEffect(() => {
-    if (chart || !chartContainer) return;
+    if (!chartContainer.current) return;
 
-    let dataset = {
-      labels: [],
-      datasets: [
-        {
-          label: [],
-          data: [],
-          showLine: false,
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsReady(true);
+          observer.disconnect();
         }
-      ]
-    };
+      },
+      { threshold: 0.1 }
+    );
 
-    const config = {
-      type: 'line',
-      data: dataset,
-      options: options,
-      plugins: [plugin],
-    }
+    observer.observe(chartContainer.current);
 
-    let chart_instance = new Chart(chartContainer.current, config);
-
-    setChart(chart_instance)
-
-    // Clean up charts on unmount
-    return () => {
-      chart_instance?.destroy();
-    };
+    return () => observer.disconnect();
   }, []);
+
+  // Create the chart only when canvas is visible and mounted
+  useEffect(() => {
+    if (!isReady || chart || !chartContainer.current) return;
+
+    // Wait until canvas is really ready
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (!chartContainer.current) return;
+
+        const dataset = {
+          labels: [],
+          datasets: [
+            {
+              label: [],
+              data: [],
+              showLine: false,
+            }
+          ]
+        };
+
+        const config = {
+          type: 'line',
+          data: dataset,
+          options: options,
+          plugins: [plugin],
+        };
+
+        const chart_instance = new Chart(chartContainer.current, config);
+        setChart(chart_instance);
+
+        return () => {
+          chart_instance?.destroy();
+        };
+      }, 50);
+    });
+  }, [isReady, chart]);
+
 
   return (
     <ChartContext.Provider value={{ chart: chart }}>
