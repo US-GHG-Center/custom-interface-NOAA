@@ -1,9 +1,10 @@
 import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
+import zoomPlugin from 'chartjs-plugin-zoom';
+import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chartjs-adapter-luxon';
 import { options } from '../components/mainChart/options';
 import { plugin } from '../components/mainChart/customPlugin';
-import '../components/mainChart/config';
 
 const ChartContext = createContext();
 
@@ -35,37 +36,32 @@ export const ChartProvider = ({ children }) => {
   useEffect(() => {
     if (!isReady || chart || !chartContainer.current) return;
 
-    // Wait until canvas is really ready
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        if (!chartContainer.current) return;
+    Chart.register(zoomPlugin, annotationPlugin, plugin);
 
-        const dataset = {
-          labels: [],
-          datasets: [
-            {
-              label: [],
-              data: [],
-              showLine: false,
-            }
-          ]
-        };
+    const dataset = {
+      labels: [],
+      datasets: [
+        {
+          label: [],
+          data: [],
+          showLine: false,
+        }
+      ]
+    };
 
-        const config = {
-          type: 'line',
-          data: dataset,
-          options: options,
-          plugins: [plugin],
-        };
+    const config = {
+      type: 'line',
+      data: dataset,
+      options: options,
+      plugins: [plugin],
+    };
 
-        const chart_instance = new Chart(chartContainer.current, config);
-        setChart(chart_instance);
+    const chart_instance = new Chart(chartContainer.current, config);
+    setChart(chart_instance);
 
-        return () => {
-          chart_instance?.destroy();
-        };
-      }, 50);
-    });
+    return () => {
+      chart_instance?.destroy();
+    };
   }, [isReady, chart]);
 
 
