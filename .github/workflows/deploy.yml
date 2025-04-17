@@ -52,10 +52,10 @@ jobs:
           [ -z "${{ secrets.REACT_APP_MAPBOX_STYLE_URL }}" ] && missing_vars+=("secrets.REACT_APP_MAPBOX_STYLE_URL")
           [ -z "${{ vars.PUBLIC_URL }}" ] && missing_vars+=("vars.PUBLIC_URL")
           # note: vars.PUBLIC_URL is expected to have leading and trailing /
-          [ -z "${{ vars.DEPLOYMENT_BUCKET }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET")
+          [ -z "${{ vars.DEPLOYMENT_BUCKET_REACT }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET_REACT")
           [ -z "${{ vars.DEPLOYMENT_REGION }}" ] && missing_vars+=("vars.DEPLOYMENT_REGION")
-          [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN")
-          [ -z "${{ secrets.CF_DISTRIBUTION_ID }}" ] && missing_vars+=("secrets.CF_DISTRIBUTION_ID")
+          [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN_REACT }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN_REACT")
+          [ -z "${{ secrets.CF_DISTRIBUTION_ID_REACT }}" ] && missing_vars+=("secrets.CF_DISTRIBUTION_ID_REACT")
           [ -z "${{ vars.REACT_APP_FEATURES_API_URL }}" ] && missing_vars+=("vars.REACT_APP_FEATURES_API_URL")`
           # If any variables are missing, print them and exit with an error
           if [ ${#missing_vars[@]} -ne 0 ]; then
@@ -107,16 +107,16 @@ jobs:
       - name: ConfigureAWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
+          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN_REACT }}
           role-session-name: ${{ github.repository_owner}}
           aws-region: ${{ vars.DEPLOYMENT_REGION }}
 
       - name: Upload to S3
         run: |
-          aws s3 sync "./build" s3://${{ vars.DEPLOYMENT_BUCKET }}${{ vars.PUBLIC_URL}} --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+          aws s3 sync "./build" s3://${{ vars.DEPLOYMENT_BUCKET_REACT }}${{ vars.PUBLIC_URL}} --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
       - name: Request Invalidation to AWS Cloudfront
         uses: oneyedev/aws-cloudfront-invalidation@v1
         with:
-          distribution-id: ${{ secrets.CF_DISTRIBUTION_ID }}
+          distribution-id: ${{ secrets.CF_DISTRIBUTION_ID_REACT }}
           paths: |
             ${{ vars.PUBLIC_URL }}
