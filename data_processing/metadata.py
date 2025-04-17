@@ -7,7 +7,7 @@ from shapely.geometry import Point
 
 
 def process_csv_files():
-     """
+    """
     Processes all CSV files under the `../data/processed/` directory to extract site metadata,
     filters out excluded sites, and generates a GeoJSON file containing metadata for all valid sites.
 
