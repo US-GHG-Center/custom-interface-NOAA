@@ -69,11 +69,11 @@ const getMaxLimitPerPage = (url) => {
   // Note: as of current features api deployment, the max limit is 1000 for collection result and 10,000 for colleciton item result
   if (url.includes('items')) {
       // https://<url>/api/features/collections/<collection_id>/items
-      return 10000;
+      return 9999;
   }
   if (url.includes('collections')) {
       // https://<url>/api/features/collections
-      return 1000;
+      return 999;
   }
   return 10;
 }

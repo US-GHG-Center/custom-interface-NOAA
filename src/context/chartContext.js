@@ -11,7 +11,7 @@ export const ChartProvider = ({ children }) => {
   const [chart, setChart] = useState(null);
 
   useEffect(() => {
-    if (chart) return;
+    if (chart || !chartContainer.current) return;
 
     let dataset = {
       labels: [],

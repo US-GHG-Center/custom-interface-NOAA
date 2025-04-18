@@ -37,21 +37,33 @@ export const ChartTitle = ({ children }) => {
 
 export const ChartInstruction = () => {
   // Displays instruction for interacting with the chart when the info icon is hovered
-    const [showInstructions, setShowInstructions] = useState(false);
-    return (
-      <div id="chart-instructions-container">
-          <FontAwesomeIcon icon={faCircleInfo} onMouseEnter={() => setShowInstructions(true)} onMouseLeave={() => setShowInstructions(false)} />
-          {showInstructions && (
-            <div id="chart-instructions">
-              <p>1. Click and drag, scroll or pinch on the chart to zoom in.</p>
-              <p>2. Hover over data points when zoomed in to see the values.</p>
-              <p>3. Click on the rectangle boxes on the side to toggle chart.</p>
-            </div>
-          )}
+  const [showInstructions, setShowInstructions] = useState(false);
+  return (
+    <div id="chart-instructions-container">
+      <FontAwesomeIcon icon={faCircleInfo} onMouseEnter={() => setShowInstructions(true)} onMouseLeave={() => setShowInstructions(false)} />
+      {showInstructions && (
+        <div id="chart-instructions">
+          <p>1. Click and drag, scroll or pinch on the chart to zoom in.</p>
+          <p>2. Hover over data points when zoomed in to see the values.</p>
+          <p>3. Click on the rectangle boxes on the side to toggle chart.</p>
         </div>
-    );
-  };
-  
+      )}
+    </div>
+  );
+};
+
+export const ClearChart = () => {
+  // Clears the chart data when new data is loaded
+  // Uses the useChart hook to access the chart object
+  const { chart } = useChart();
+  useEffect(() => {
+    if (!chart) return;
+    chart.data.labels = [];
+    chart.data.datasets = [];
+    chart.update();
+  }, [chart]);
+  return null;
+};
 
 export const ZoomResetTool = () => {
   // Resets the zoom level of the chart when the reset zoom icon is clicked
@@ -65,14 +77,14 @@ export const ZoomResetTool = () => {
 
   return (
     <>
-    <FontAwesomeIcon
-      id="zoom-reset-button"
-      icon={faRotateLeft}
-      data-tooltip-id="close-chart-tooltip"
-      data-tooltip-content="Reset Chart Zoom"
-      onClick={handleResetZoom}
-    />
-    <Tooltip id="close-chart-tooltip" place="bottom" style={tooltipStyle}/>
+      <FontAwesomeIcon
+        id="zoom-reset-button"
+        icon={faRotateLeft}
+        data-tooltip-id="close-chart-tooltip"
+        data-tooltip-content="Reset Chart Zoom"
+        onClick={handleResetZoom}
+      />
+      <Tooltip id="close-chart-tooltip" place="bottom" style={tooltipStyle} />
     </>
   );
 };
@@ -82,14 +94,14 @@ export const CloseButton = ({ handleClose }) => (
   // Closes the chart when the close icon is clicked
   // Receives the handleClose function as a prop
   <>
-  <FontAwesomeIcon
-    id="chart-close-button"
-    icon={faXmark}
-    data-tooltip-id="close-chart-tooltip"
-    data-tooltip-content="Close Chart"
-    onClick={handleClose}
-  />
-  <Tooltip id="close-chart-tooltip" place="bottom" style={tooltipStyle}/>
+    <FontAwesomeIcon
+      id="chart-close-button"
+      icon={faXmark}
+      data-tooltip-id="close-chart-tooltip"
+      data-tooltip-content="Close Chart"
+      onClick={handleClose}
+    />
+    <Tooltip id="close-chart-tooltip" place="bottom" style={tooltipStyle} />
   </>
 );
 
@@ -108,11 +120,11 @@ export const DataAccessTool = ({ dataAccessLink, tooltip }) => {
       >
         <FontAwesomeIcon icon={faExternalLink} />
       </a>
-      <Tooltip id="data-access-tooltip" place="bottom" style={tooltipStyle}/>
+      <Tooltip id="data-access-tooltip" place="bottom" style={tooltipStyle} />
     </>
   );
 };
-  
+
 
 export const ChartTools = ({ children }) => {
   // Displays the chart tools
@@ -123,7 +135,7 @@ export const ChartTools = ({ children }) => {
   );
 };
 
-  
+
 export const ChartToolsLeft = ({ children }) => {
   // Left align chart tools
   return (
@@ -134,7 +146,7 @@ export const ChartToolsLeft = ({ children }) => {
     </div>
   );
 };
-  
+
 
 export const ChartToolsRight = ({ children }) => {
   // Right align chart tools
