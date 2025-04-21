@@ -57,27 +57,28 @@ export const LineChart = ({
     // Centralized x-axis scale configuration
     const xAxisConfig = {
       type: 'time',
-      // labels: labels,
       display: true,
+      time: {
+        tooltipFormat: 'dd MMM yyyy', // for tooltips
+        unit: false, // let it auto-determine
+      },
       grid: {
         display: false,
         drawOnChartArea: false,
       },
       ticks: {
-        callback: function (value) {
-          // timespan from labels
-          const timeSpan = new Date(labels[labels.length - 1]) - new Date(labels[0]);
-          if (timeSpan > 365 * 24 * 60 * 60 * 1000) {
-            return new Date(value).getFullYear();
-          }
-          return new Date(value).toLocaleDateString('en-GB', { year: 'numeric', month: 'short' });
-        },
-        autoskip: true,
+        source: 'auto',
+        autoSkip: true,
         maxTicksLimit: 10,
       },
       title: {
         text: labelX,
         display: !!labelX,
+      },
+      adapters: {
+        date: {
+          zone: 'UTC',
+        },
       },
     };
 
