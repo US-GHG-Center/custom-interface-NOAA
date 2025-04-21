@@ -5,6 +5,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { measurementLegend } from '../../constants';
 
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 
@@ -39,6 +40,7 @@ import {
   ZoomResetTool,
   CloseButton,
   LineChart,
+  ClearChart,
 } from '@components';
 
 import styled from 'styled-components';
@@ -70,7 +72,6 @@ export function Dashboard({
   agency,
 }) {
   // states for data
-  const [displayChart, setDisplayChart] = useState(false);
   const [vizItems, setVizItems] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [dataAccessURL, setDataAccessURL] = useState('');
@@ -78,6 +79,12 @@ export function Dashboard({
 
   const [isNrtStation, setIsNrtStation] = useState(false);
   const [nrtStationMeta, setNrtStationMeta] = useState(null);
+
+  const [clearChart, setClearChart] = useState(true);
+  const [displayChart, setDisplayChart] = useState(false);
+  const [renderChart, setRenderChart] = useState(false);
+
+  const prevChartDataRef = useRef([]);
 
 
   // handler functions
@@ -95,6 +102,11 @@ export function Dashboard({
     setSelectedStationId(null);
     setIsNrtStation(false);
   }
+
+  const handleClearComplete = () => {
+    setClearChart(false);
+    setRenderChart(true);
+  };
 
   // Handle special case of NRT dataset
 
@@ -192,11 +204,24 @@ export function Dashboard({
   }, [stationData, selectedFrequency]);
 
 
-  // display chart when chartData is populated
+  // set displayChart to true chartData is populated
   useEffect(() => {
+    const prev = prevChartDataRef.current;
+  
+    const isSubset = prev.every(prevItem =>
+      chartData.some(currItem => JSON.stringify(currItem) === JSON.stringify(prevItem))
+    );
+  
+    const isChanged = JSON.stringify(prev) !== JSON.stringify(chartData);
+  
+    if (isChanged && !isSubset) {
+      setClearChart(true);
+      setRenderChart(false);
+    }
+  
+    prevChartDataRef.current = chartData;
     setDisplayChart(chartData.length > 0);
   }, [chartData]);
-
 
   return (
     <Box className='fullSize'>
@@ -243,76 +268,79 @@ export function Dashboard({
             </MainMap>
           </div>
         </Panel>
-        {displayChart && (
-          <>
-            <PanelResizeHandle className='resize-handle'>
-              <DragHandleIcon title='Resize' />
-            </PanelResizeHandle>
 
-            <Panel
-              id='chart-panel'
-              maxSize={75}
-              minSize={40}
-              className='panel panel-timeline'
-              order={2}
-            >
-              <MainChart>
-                {/* Instructions and Tools container */}
-                <ChartTools>
-                  <ChartToolsLeft>
-                    <ChartInstruction />
-                  </ChartToolsLeft>
-                  <ChartToolsRight>
-                    {isNrtStation && nrtStationMeta &&
-                      <DataAccessTool
-                        dataAccessLink={nrtStationMeta.source}
-                        tooltip="Access NRT Dataset"
-                      />
-                    }
-                    {dataAccessURL &&
-                      <DataAccessTool
-                        dataAccessLink={dataAccessURL}
-                        tooltip="Access NOAA Dataset"
-                      />
-                    }
-                    <ZoomResetTool />
-                    <CloseButton handleClose={handleChartClose} />
-                  </ChartToolsRight>
-                </ChartTools>
+        <PanelResizeHandle
+          className='resize-handle'
+          style={{ display: displayChart ? 'block' : 'none' }}
+        >
+          <DragHandleIcon title='Resize' />
+        </PanelResizeHandle>
 
-
-                {/* Main chart container */}
-                <ChartTitle>{
-                  selectedStationId ?
-                    stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')' :
-                    'Chart'}
-                </ChartTitle>
-                {chartData.length > 0 && chartData.map((data, index) => (
-                  <LineChart
-                    key={data.id}
-                    data={data.value}
-                    labels={data.label}
-                    legend={data.legend}
-                    labelX={data.labelX}
-                    labelY={data.labelY}
-                    index={index}
-                    showLine={data.displayLine}
-                    color={data.color}
+        <Panel
+          id='chart-panel'
+          maxSize={75}
+          minSize={40}
+          className='panel panel-timeline'
+          order={2}
+          style={{ display: displayChart ? 'block' : 'none' }}
+        >
+          <MainChart>
+            {/* Instructions and Tools container */}
+            <ChartTools>
+              <ChartToolsLeft>
+                <ChartInstruction />
+              </ChartToolsLeft>
+              <ChartToolsRight>
+                {isNrtStation && nrtStationMeta &&
+                  <DataAccessTool
+                    dataAccessLink={nrtStationMeta.source}
+                    tooltip="Access NRT Dataset"
                   />
-                ))}
-              </MainChart>
+                }
+                {dataAccessURL &&
+                  <DataAccessTool
+                    dataAccessLink={dataAccessURL}
+                    tooltip="Access NOAA Dataset"
+                  />
+                }
+                <ZoomResetTool />
+                <CloseButton handleClose={handleChartClose} />
+              </ChartToolsRight>
+            </ChartTools>
 
-            </Panel>
-            <div>
-              {isNrtStation && nrtStationMeta &&
-                <div className='nrt-station-note-container'>
-                  <FontAwesomeIcon icon={faMessage} /> <b>Note</b>
-                  <div className='nrt-station-note'>{nrtStationMeta.notice}</div>
-                </div>
-              }
-            </div>
-          </>
-        )}
+
+            {/* Main chart container */}
+            <ChartTitle>{
+              selectedStationId ?
+                stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')' :
+                'Chart'}
+            </ChartTitle>
+            {clearChart && <ClearChart onDone={handleClearComplete} />}
+            {renderChart &&
+              chartData.map((data, index) => (
+                <LineChart
+                  key={data.id}
+                  data={data.value}
+                  labels={data.label}
+                  legend={data.legend}
+                  labelX={data.labelX}
+                  labelY={data.labelY}
+                  index={index}
+                  showLine={data.displayLine}
+                  color={data.color}
+                />
+              ))}
+          </MainChart>
+        </Panel>
+        {isNrtStation && nrtStationMeta &&
+          <div
+            className='nrt-station-note-container'
+            style={{ display: displayChart ? 'block' : 'none' }}
+          >
+            <FontAwesomeIcon icon={faMessage} /> <b>Note</b>
+            <div className='nrt-station-note'>{nrtStationMeta.notice}</div>
+          </div>
+        }
       </PanelGroup>
       {(loadingData) && <LoadingSpinner />}
     </Box>

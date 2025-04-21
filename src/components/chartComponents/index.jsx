@@ -52,6 +52,20 @@ export const ChartInstruction = () => {
   );
 };
 
+export const ClearChart = ({ onDone }) => {
+  const { chart } = useChart();
+
+  useEffect(() => {
+    if (chart) {
+      chart.data.labels = [];
+      chart.data.datasets = [];
+      chart.update();
+    }
+    onDone();
+  }, [chart, onDone]);
+
+  return null;
+};
 
 export const ZoomResetTool = () => {
   // Resets the zoom level of the chart when the reset zoom icon is clicked
