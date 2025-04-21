@@ -7,7 +7,6 @@ export const fetchAllFromFeaturesAPI = async (featureApiUrl) => {
     let offset = 0;
     let pageLimit = getMaxLimitPerPage(featureApiUrl);
     let url = addOffsetsToURL(featureApiUrl, offset, pageLimit);
-    console.log('Modified url', url);
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error('Error in Network');
