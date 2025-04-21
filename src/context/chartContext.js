@@ -1,44 +1,25 @@
 import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
-import zoomPlugin from 'chartjs-plugin-zoom';
-import annotationPlugin from 'chartjs-plugin-annotation';
-import 'chartjs-adapter-luxon';
-import { options } from '../components/mainChart/options';
 import { plugin } from '../components/mainChart/customPlugin';
+import { options } from '../components/mainChart/options';
+import zoomPlugin from "chartjs-plugin-zoom";
+import annotationPlugin from "chartjs-plugin-annotation";
+import 'chartjs-adapter-luxon';
 
 const ChartContext = createContext();
 
 export const ChartProvider = ({ children }) => {
   const chartContainer = useRef(null);
   const [chart, setChart] = useState(null);
-  const [isReady, setIsReady] = useState(false);
 
-  // Observer to wait until canvas is visible
   useEffect(() => {
-    if (!chartContainer.current) return;
+    if (chart || !chartContainer.current) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsReady(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
+    Chart.register(zoomPlugin);
+    Chart.register(annotationPlugin);
+    Chart.register(plugin);
 
-    observer.observe(chartContainer.current);
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Create the chart only when canvas is visible and mounted
-  useEffect(() => {
-    if (!isReady || chart || !chartContainer.current) return;
-
-    Chart.register(zoomPlugin, annotationPlugin, plugin);
-
-    const dataset = {
+    let dataset = {
       labels: [],
       datasets: [
         {
@@ -54,16 +35,17 @@ export const ChartProvider = ({ children }) => {
       data: dataset,
       options: options,
       plugins: [plugin],
-    };
+    }
 
-    const chart_instance = new Chart(chartContainer.current, config);
-    setChart(chart_instance);
+    let chart_instance = new Chart(chartContainer.current, config);
 
+    setChart(chart_instance)
+
+    // Clean up charts on unmount
     return () => {
       chart_instance?.destroy();
     };
-  }, [isReady, chart]);
-
+  }, []);
 
   return (
     <ChartContext.Provider value={{ chart: chart }}>
