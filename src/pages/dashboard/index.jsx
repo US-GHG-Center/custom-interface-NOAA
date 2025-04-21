@@ -72,7 +72,6 @@ export function Dashboard({
   agency,
 }) {
   // states for data
-  const [displayChart, setDisplayChart] = useState(false);
   const [vizItems, setVizItems] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [dataAccessURL, setDataAccessURL] = useState('');
@@ -80,6 +79,12 @@ export function Dashboard({
 
   const [isNrtStation, setIsNrtStation] = useState(false);
   const [nrtStationMeta, setNrtStationMeta] = useState(null);
+
+  const [clearChart, setClearChart] = useState(true);
+  const [displayChart, setDisplayChart] = useState(false);
+  const [renderChart, setRenderChart] = useState(false);
+
+  const prevChartDataRef = useRef([]);
 
 
   // handler functions
@@ -97,6 +102,11 @@ export function Dashboard({
     setSelectedStationId(null);
     setIsNrtStation(false);
   }
+
+  const handleClearComplete = () => {
+    setClearChart(false);
+    setRenderChart(true);
+  };
 
   // Handle special case of NRT dataset
 
@@ -196,6 +206,20 @@ export function Dashboard({
 
   // set displayChart to true chartData is populated
   useEffect(() => {
+    const prev = prevChartDataRef.current;
+  
+    const isSubset = prev.every(prevItem =>
+      chartData.some(currItem => JSON.stringify(currItem) === JSON.stringify(prevItem))
+    );
+  
+    const isChanged = JSON.stringify(prev) !== JSON.stringify(chartData);
+  
+    if (isChanged && !isSubset) {
+      setClearChart(true);
+      setRenderChart(false);
+    }
+  
+    prevChartDataRef.current = chartData;
     setDisplayChart(chartData.length > 0);
   }, [chartData]);
 
@@ -291,24 +315,21 @@ export function Dashboard({
                 stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')' :
                 'Chart'}
             </ChartTitle>
-            {chartData.length > 0 && (
-              <>
-                <ClearChart />
-                {chartData.map((data, index) => (
-                  <LineChart
-                    key={data.id}
-                    data={data.value}
-                    labels={data.label}
-                    legend={data.legend}
-                    labelX={data.labelX}
-                    labelY={data.labelY}
-                    index={index}
-                    showLine={data.displayLine}
-                    color={data.color}
-                  />
-                ))}
-              </>
-            )}
+            {clearChart && <ClearChart onDone={handleClearComplete} />}
+            {renderChart &&
+              chartData.map((data, index) => (
+                <LineChart
+                  key={data.id}
+                  data={data.value}
+                  labels={data.label}
+                  legend={data.legend}
+                  labelX={data.labelX}
+                  labelY={data.labelY}
+                  index={index}
+                  showLine={data.displayLine}
+                  color={data.color}
+                />
+              ))}
           </MainChart>
         </Panel>
         {isNrtStation && nrtStationMeta &&

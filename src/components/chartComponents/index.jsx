@@ -52,16 +52,18 @@ export const ChartInstruction = () => {
   );
 };
 
-export const ClearChart = () => {
-  // Clears the chart data when new data is loaded
-  // Uses the useChart hook to access the chart object
+export const ClearChart = ({ onDone }) => {
   const { chart } = useChart();
+
   useEffect(() => {
-    if (!chart) return;
-    chart.data.labels = [];
-    chart.data.datasets = [];
-    chart.update();
-  }, [chart]);
+    if (chart) {
+      chart.data.labels = [];
+      chart.data.datasets = [];
+      chart.update();
+    }
+    onDone();
+  }, [chart, onDone]);
+
   return null;
 };
 
