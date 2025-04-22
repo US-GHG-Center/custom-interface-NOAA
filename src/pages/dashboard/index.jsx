@@ -245,7 +245,7 @@ export function Dashboard({
               {vizItems.map((item) => {
                 const [category, data] = Object.entries(item)[0];
                 console.log({ data });
-                
+
                 if (selectedFrequency === "all" || selectedFrequency === category) {
                   return Object.values(data.stations).map((station) => {
                     return (
@@ -259,14 +259,14 @@ export function Dashboard({
                     );
                   });
                 }
-            
+
                 return null;
               })}
               <FrequencyDropdown
                 selectedValue={selectedFrequency}
                 setSelectedValue={setSelectedFrequency}
               />
-              <Legend legendData={legendData} />
+              {legendData.length > 0 && <Legend legendData={legendData} />}
             </MainMap>
           </div>
         </Panel>
