@@ -33,8 +33,22 @@ export const handleSpecialCases = async (stationData, isNrtStation, nrtStationMe
 
         if (response.length > 0) {
             const itemData = response[0].properties;
-            mkoCollectionItem.datetime = itemData.datetime;
-            mkoCollectionItem.value = itemData.value;
+            const cutoffDate = new Date('2023-07-04T00:00:00Z');
+    
+            const filtered = itemData.datetime.reduce(
+                (acc, dateStr, index) => {
+                    const currentDate = new Date(dateStr);
+                    if (currentDate <= cutoffDate) {
+                        acc.datetime.push(dateStr);
+                        acc.value.push(itemData.value[index]);
+                    }
+                    return acc;
+                },
+                { datetime: [], value: [] }
+            );
+    
+            mkoCollectionItem.datetime = filtered.datetime;
+            mkoCollectionItem.value = filtered.value;
         }
 
         // Create a local dictionary (object) to be appended to chartData state
@@ -47,7 +61,7 @@ export const handleSpecialCases = async (stationData, isNrtStation, nrtStationMe
                 legend: 'Observed CO₂ Concentration (MKO daily In-situ)',
                 labelX: 'Observation Date/Time (UTC)',
                 labelY: 'Carbon Dioxide CO₂ Concentration (ppm)',
-                displayLine: false,
+                displayLine: true,
             };
 
             // Update chartData state only if the ID doesn't already exist
