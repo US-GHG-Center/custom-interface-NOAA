@@ -143,7 +143,7 @@ export function Dashboard({
   // update the chart data whenever selected station, data frequency or vizItems changes
   useEffect(() => {
     if (!selectedStationId || !vizItems) return;
-    setLoadingData(true);
+    setDisplayChart(true);
 
     let selectedCategory;
 
@@ -182,6 +182,7 @@ export function Dashboard({
       }
     } else {
       setChartData([]);
+      setDisplayChart(false);
     }
 
     if (nrtStationMeta && (nrtStationMeta.stationCode === selectedStationId)) {
@@ -190,8 +191,6 @@ export function Dashboard({
 
     // Set data access URL
     setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
-
-    setLoadingData(false);
   }, [selectedStationId, vizItems, selectedFrequency]);
 
 
@@ -220,7 +219,6 @@ export function Dashboard({
     }
 
     prevChartDataRef.current = chartData;
-    setDisplayChart(chartData.length > 0);
   }, [chartData]);
 
   return (

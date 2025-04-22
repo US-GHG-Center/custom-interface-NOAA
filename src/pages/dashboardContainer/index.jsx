@@ -38,14 +38,12 @@ export function DashboardContainer() {
         // Fetch and transform station metadata
         const stationApiResponse = await fetchAllFromFeaturesAPI(stationUrl);
         const transformedStationData = dataTransformationStation(stationApiResponse);
-        // setStations(transformedStationData);
 
         // Fetch and transform collection data
         const collectionApiResponse = await fetchAllFromFeaturesAPI(collectionUrl);
         dataTransformCollection(collectionApiResponse, transformedStationData, agency, ghg, time_period);
 
         // todo: avoide mutation on data
-
         setStations(transformedStationData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -73,7 +71,6 @@ export function DashboardContainer() {
       updatedstations[selectedStationId] = updatedStation;
 
       try {
-        setLoading(true);
         // Fetch missing datetime and values in parallel
         await Promise.all(
           selectedStation.collection_items.map(async (item, index) => {
@@ -99,8 +96,6 @@ export function DashboardContainer() {
         setStations(updatedstations);
       } catch (error) {
         console.error('Error in fetchCollectionItemValue:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
