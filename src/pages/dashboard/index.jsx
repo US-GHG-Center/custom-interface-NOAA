@@ -143,9 +143,7 @@ export function Dashboard({
   // update the chart data whenever selected station, data frequency or vizItems changes
   useEffect(() => {
     if (!selectedStationId || !vizItems) return;
-    setDisplayChart(false);
     setLoadingData(true);
-    setChartData([]);
 
     let selectedCategory;
 
@@ -182,6 +180,8 @@ export function Dashboard({
         });
         setChartData(processedChartData);
       }
+    } else {
+      setChartData([]);
     }
 
     if (nrtStationMeta && (nrtStationMeta.stationCode === selectedStationId)) {
@@ -207,18 +207,18 @@ export function Dashboard({
   // set displayChart to true chartData is populated
   useEffect(() => {
     const prev = prevChartDataRef.current;
-  
+
     const isSubset = prev.every(prevItem =>
       chartData.some(currItem => JSON.stringify(currItem) === JSON.stringify(prevItem))
     );
-  
+
     const isChanged = JSON.stringify(prev) !== JSON.stringify(chartData);
-  
+
     if (isChanged && !isSubset) {
       setClearChart(true);
       setRenderChart(false);
     }
-  
+
     prevChartDataRef.current = chartData;
     setDisplayChart(chartData.length > 0);
   }, [chartData]);
@@ -244,21 +244,23 @@ export function Dashboard({
               <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
               {vizItems.map((item) => {
                 const [category, data] = Object.entries(item)[0];
-
-                // Conditionally render Marker based on selectedFrequency
+                console.log({ data });
+                
                 if (selectedFrequency === "all" || selectedFrequency === category) {
-                  return (
-                    <MarkerFeature
-                      key={category}
-                      vizItems={Object.values(data.stations)}
-                      onSelectVizItem={handleSelectedVizItem}
-                      markerColor={data.color}
-                      getPopupContent={getPopUpContent}
-                    />
-                  );
+                  return Object.values(data.stations).map((station) => {
+                    return (
+                      <MarkerFeature
+                        key={station.id}
+                        items={[station]}
+                        onSelectVizItem={handleSelectedVizItem}
+                        markerColor={data.color}
+                        getPopupContent={getPopUpContent}
+                      />
+                    );
+                  });
                 }
-
-                return null; // Ensure nothing is rendered if conditions don't match
+            
+                return null;
               })}
               <FrequencyDropdown
                 selectedValue={selectedFrequency}
