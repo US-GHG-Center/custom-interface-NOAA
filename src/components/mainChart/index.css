@@ -19,13 +19,7 @@
     z-index: 1;
 }
 
-#chart-tools-left {
-    align-items: center;
-    gap: 10px;
-    margin: 10px;
-}
-
-#chart-tools-right {
+#chart-tools-left, #chart-tools-right {
     align-items: center;
     gap: 10px;
     margin: 10px;
@@ -78,6 +72,6 @@
 }
 
 #data-access-link {
-    margin-right: 7px;
+    margin-right: 12px;
     text-decoration: none;
 }

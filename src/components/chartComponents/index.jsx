@@ -120,7 +120,7 @@ export const DataAccessTool = ({ dataAccessLink, tooltip }) => {
         data-tooltip-content={tooltip}
         class='data-access-tool'
       >
-        <FontAwesomeIcon icon={faExternalLink} />
+        {tooltip} <FontAwesomeIcon icon={faExternalLink} />
       </a>
       <Tooltip id="data-access-tooltip" place="bottom" style={tooltipStyle} />
     </>
