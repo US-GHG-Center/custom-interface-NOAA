@@ -55,11 +55,14 @@ export function dataTransformCollection(
   agency_filter: string,
   ghg_filter: string,
   time_period: string[]
-): void {
+): Record<string, Station> {
   if (!Array.isArray(collectionsData)) {
     console.error("Invalid API response format: Expected an array");
-    return;
+    return stations;
   }
+
+  // Create a shallow copy of stations
+  const updatedStations: Record<string, Station> = { ...stations };
 
   collectionsData.forEach((collection: any) => {
     if (!collection.id) {
@@ -81,34 +84,43 @@ export function dataTransformCollection(
       ] = parts;
 
       const siteCodeUpper = sitecode.toUpperCase();
-      const station = stations[siteCodeUpper];
+      const station = updatedStations[siteCodeUpper];
 
       if (
         station &&
         agency === agency_filter &&
         time_period.includes(time_period_value)
       ) {
-        // Remove existing collection_items that don’t match the new ghg
-        station.collection_items = station.collection_items?.filter(
-          (item) => item.gas === ghg_filter
-        ) || [];
+        const existingItems = station.collection_items || [];
 
-        // Add only items matching the new ghg and time_period
-        if (gas === ghg_filter) {
-          station.collection_items?.push({
-            id: collection.id,
-            gas: gas,
-            gas_full_name: gas,
-            product: product,
-            measurement_inst: measurement_inst,
-            methodology: methodology,
-            time_period: time_period_value,
-            link: collection.links?.[1],
-          });
-        }
+        // Filter and add only if gas matches filter
+        const newCollectionItems = existingItems
+          .filter((item) => item.gas === ghg_filter)
+          .concat(
+            gas === ghg_filter
+              ? [
+                {
+                  id: collection.id,
+                  gas,
+                  gas_full_name: gas,
+                  product,
+                  measurement_inst,
+                  methodology,
+                  time_period: time_period_value,
+                  link: collection.links?.[1],
+                },
+              ]
+              : []
+          );
+
+        // Create new station object with updated collection_items
+        updatedStations[siteCodeUpper] = {
+          ...station,
+          collection_items: newCollectionItems,
+        };
       }
     }
   });
+
+  return updatedStations;
 }
-
-

@@ -65,7 +65,7 @@ export function Dashboard({
   zoomLevel,
   zoomLocation,
   loadingData,
-  setLoadingData,
+  loadingChartData,
   ghg,
   selectedFrequency,
   setSelectedFrequency,
@@ -144,7 +144,6 @@ export function Dashboard({
   useEffect(() => {
     if (!selectedStationId || !vizItems) return;
     setDisplayChart(true);
-
     let selectedCategory;
 
     // First, check if the station exists in 'continuous' category and then non_continuous category
@@ -316,6 +315,7 @@ export function Dashboard({
                 'Chart'}
             </ChartTitle>
             {clearChart && <ClearChart onDone={handleClearComplete} />}
+            {loadingChartData && <LoadingSpinner />}
             {renderChart &&
               chartData.map((data, index) => (
                 <LineChart

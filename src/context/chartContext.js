@@ -49,8 +49,10 @@ export const ChartProvider = ({ children }) => {
 
   return (
     <ChartContext.Provider value={{ chart: chart }}>
+      <div className='chart-body-wrapper'>
       {children}
       <canvas ref={chartContainer} style={{ width: '100%', minHeight: '30%', position: 'absolute' }}></canvas>
+      </div>
     </ChartContext.Provider>
   );
 };

@@ -17,6 +17,8 @@ export function DashboardContainer() {
   const [selectedStationId, setSelectedStationId] = useState('');
   const [stations, setStations] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadingChartData, setLoadingChartData] = useState(false);
+
 
   // get the query params
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,12 +41,18 @@ export function DashboardContainer() {
         const stationApiResponse = await fetchAllFromFeaturesAPI(stationUrl);
         const transformedStationData = dataTransformationStation(stationApiResponse);
 
-        // Fetch and transform collection data
+        // Fetch and transform collection data without mutating previous object
         const collectionApiResponse = await fetchAllFromFeaturesAPI(collectionUrl);
-        dataTransformCollection(collectionApiResponse, transformedStationData, agency, ghg, time_period);
+        const updatedStationData = dataTransformCollection(
+          collectionApiResponse,
+          transformedStationData,
+          agency,
+          ghg,
+          time_period
+        );
 
-        // todo: avoide mutation on data
-        setStations(transformedStationData);
+        // Set the final transformed station data
+        setStations(updatedStationData);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -55,6 +63,7 @@ export function DashboardContainer() {
     fetchData();
   }, []);
 
+
   // Fetch datetime and value associated with collection item whenever a station is selected
   // This is done for all collection items of selected station
   useEffect(() => {
@@ -64,44 +73,47 @@ export function DashboardContainer() {
       const selectedStation = stations[selectedStationId];
       if (!selectedStation?.collection_items) return;
 
-
-      // Create a deep copy of stations to avoid mutation
-      const updatedstations = { ...stations };
-      const updatedStation = { ...updatedstations[selectedStationId] };
-      updatedstations[selectedStationId] = updatedStation;
+      // Create a deep copy of stations and selected station
+      const updatedStations = { ...stations };
 
       try {
-        // Fetch missing datetime and values in parallel
-        await Promise.all(
-          selectedStation.collection_items.map(async (item, index) => {
-            if (!item.datetime || !item.value) {
-              try {
-                const response = await fetchAllFromFeaturesAPI(
-                  `${FEATURES_API_URL}/collections/${item.id}/items`
-                );
+        setLoadingChartData(true);
+        const updatedCollectionItems = await Promise.all(
+          selectedStation.collection_items.map(async (item) => {
+            if (item.datetime && item.value) return item;
 
-                if (response.length > 0) {
-                  item.datetime = response[0].properties.datetime;
-                  item.value = response[0].properties.value;
-                }
-              } catch (error) {
-                console.error(`Error fetching data for item ${item.id}:`, error);
-                return;
+            try {
+              const response = await fetchAllFromFeaturesAPI(
+                `${FEATURES_API_URL}/collections/${item.id}/items`
+              );
+
+              if (response.length > 0) {
+                const { datetime, value } = response[0].properties;
+                return { ...item, datetime, value };
               }
+            } catch (error) {
+              console.error(`Error fetching data for item ${item.id}:`, error);
             }
+
+            return item; // fallback to original item
           })
         );
 
-        // Update station data and chart data
-        setStations(updatedstations);
+        updatedStations[selectedStationId] = {
+          ...selectedStation,
+          collection_items: updatedCollectionItems,
+        };
+
+        setStations(updatedStations);
       } catch (error) {
         console.error('Error in fetchCollectionItemValue:', error);
+      } finally {
+        setLoadingChartData(false);
       }
     };
 
     fetchCollectionItemValue();
   }, [selectedStationId]);
-
 
   // Update the search params whenever a state value changes
   useEffect(() => {
@@ -128,6 +140,7 @@ export function DashboardContainer() {
       zoomLevel={zoomLevel}
       zoomLocation={zoomLocation}
       loadingData={loading}
+      loadingChartData={loadingChartData}
       setLoadingData={setLoading}
       selectedFrequency={selectedFrequency}
       setSelectedFrequency={setSelectedFrequency}
