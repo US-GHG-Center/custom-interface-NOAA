@@ -54,9 +54,10 @@ def handle_MKO_data_clip(df):
     # Convert datetime column to actual datetime objects
     df['datetime'] = pd.to_datetime(df['datetime'])
 
-    # Define start and end dates
-    start_date = pd.to_datetime('2022-11-29')
-    end_date = pd.to_datetime('2023-07-04')
+    # Define start and end dates with UTC timezone
+    start_date = pd.Timestamp('2022-11-29', tz='UTC')
+    end_date = pd.Timestamp('2023-07-04', tz='UTC')
+
 
     # Filter the dataframe
     clipped_df = df[(df['datetime'] >= start_date) & (df['datetime'] <= end_date)]
