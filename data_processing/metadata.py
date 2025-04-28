@@ -62,7 +62,6 @@ def process_csv_files():
                                     latitude= ("latitude","first"),
                                     longitude= ("longitude","first")).reset_index()
     df = df[~df['site_code'].isin(excluded_sites)]
-    print(df)
     # Convert to GeoDataFrame
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs="EPSG:4326")
     # Save as GeoJSON
