@@ -1,6 +1,9 @@
 name: Update data on a schedule
 
 on:
+  push:
+    branches:
+      - update-data 
   schedule:
     - cron: 0 0 1 * * # Runs on the first day of every month
   workflow_dispatch: # Can be run manually if needed
@@ -42,7 +45,7 @@ jobs:
     needs: preprocess-data
     strategy:
       matrix:
-        environment: [development, staging, production]
+        environment: [development]
     environment: ${{ matrix.environment }}
 
     permissions:
