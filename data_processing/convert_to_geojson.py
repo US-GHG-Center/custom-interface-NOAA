@@ -41,6 +41,29 @@ def gdf_to_geojson(gdf):
     }
     return geojson
 
+def handle_MKO_data_clip(df):
+    """
+    Clips the MKO site data between Nov 29, 2022 and July 4, 2023.
+
+    Parameters:
+        df (pandas.DataFrame): The input DataFrame with a 'datetime' column.
+
+    Returns:
+        pandas.DataFrame: The clipped DataFrame.
+    """
+    # Convert datetime column to actual datetime objects
+    df['datetime'] = pd.to_datetime(df['datetime'])
+
+    # Define start and end dates
+    start_date = pd.to_datetime('2022-11-29')
+    end_date = pd.to_datetime('2023-07-04')
+
+    # Filter the dataframe
+    clipped_df = df[(df['datetime'] >= start_date) & (df['datetime'] <= end_date)]
+
+    return clipped_df
+
+
 def check_if_excluded(site_name):
     """
     Checks if a given site code is in the list of excluded sites.
@@ -74,6 +97,11 @@ def process_csv_files():
     for file in glob.glob(os.path.join(script_dir, "../data/processed/**/*.csv"), recursive=True):
         df = pd.read_csv(file)
         site_code = file.split("/")[-1].split(".")[0].split("_")[4]
+
+        # handle mko files 
+        if site_code.lower()=='mko':
+            df = handle_MKO_data_clip(df)
+
         if check_if_excluded(site_code):
             print(f"Excluding {file} from further processing")
         else:
