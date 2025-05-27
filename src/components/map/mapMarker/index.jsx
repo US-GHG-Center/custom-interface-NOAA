@@ -14,8 +14,11 @@ import './index.css';
  * @param {Object} items[].coordinates - Coordinate object containing lat/lon.
  * @param {number} items[].coordinates.lat - Latitude for the marker.
  * @param {number} items[].coordinates.lon - Longitude for the marker.
+ * @param {number} items[].station - information for the station
  * @param {Function} onSelectVizItem - Callback when a marker is clicked. Passes the marker ID.
  * @param {Function} getPopupContent - Callback that returns popup HTML string for a given item.
+ * @param {string}  markerColor - Color for the class of marker
+ * @param {number}   - threshold for the zoom of map 
  *
  * @returns {null} This component renders directly on the map using Mapbox API.
  */
@@ -24,12 +27,13 @@ export const MarkerFeature = ({
   onSelectVizItem,
   getPopupContent,
   zoomThreshold = 0,
-  markerColor = '#00b7eb'
+  markerColor = '#00b7eb',
 }) => {
   const { map } = useMapbox();
   const [markersVisible, setMarkersVisible] = useState(true);
   const markersRef = useRef([]);
-  
+
+
   /**
    * Creates a custom Mapbox marker element and adds popup + event handlers.
    *
@@ -41,9 +45,12 @@ export const MarkerFeature = ({
   // Memoized marker creation function
   const createMarker = useCallback(
     (item) => {
-      const id = item.id;
-      const coordinates = item.geometry.coordinates[0];
-      const  [lon, lat] = coordinates[0];
+      if (!map || !item?.coordinates?.lat || !item?.coordinates?.lon) {
+        console.warn('Skipping marker: invalid map or coordinates', item);
+        return null;
+      }
+      const { coordinates, id } = item;
+      const { lon, lat } = coordinates;
       const color = markerColor;
 
       // Create marker element
@@ -60,10 +67,10 @@ export const MarkerFeature = ({
       // Create popup if content provided
       const popup = getPopupContent
         ? new mapboxgl.Popup({
-          offset: 5,
-          closeButton: false,
-          closeOnClick: false,
-        }).setHTML(getPopupContent(item))
+            offset: 5,
+            closeButton: false,
+            closeOnClick: false,
+          }).setHTML(getPopupContent(item?.station))
         : undefined;
 
       // Event handlers
@@ -106,13 +113,12 @@ export const MarkerFeature = ({
     });
 
     // Create and add new markers
-    const newMarkers = items.map(createMarker);
+    const newMarkers = items.map(createMarker).filter(Boolean);
     newMarkers.forEach(({ marker }) => marker.addTo(map));
-
-    // Update markers visibility and ref
     newMarkers.forEach(({ element }) => {
       element.style.display = markersVisible ? 'block' : 'none';
     });
+
     markersRef.current = newMarkers;
 
     // Cleanup function

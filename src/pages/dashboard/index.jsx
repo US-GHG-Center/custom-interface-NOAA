@@ -270,26 +270,33 @@ export function Dashboard({
               <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
               {vizItems.map((item) => {
                 const [category, data] = Object.entries(item)[0];
-                console.log({ data });
-
                 if (
                   selectedFrequency === 'all' ||
                   selectedFrequency === category
                 ) {
-                  return Object.values(data.stations).map((station) => {
-                    return (
-                      <MarkerFeature
-                        key={station.id}
-                        items={[station]}
-                        onSelectVizItem={handleSelectedVizItem}
-                        markerColor={data.color}
-                        getPopupContent={getPopUpContent}
-                      />
-                    );
-                  });
+                  const stations = Object.values(data.stations).map(
+                    (station) => {
+                      return {
+                        id: station?.id,
+                        coordinates: {
+                          lon: station?.geometry?.coordinates[0][0][0],
+                          lat: station?.geometry?.coordinates[0][0][1],
+                        },
+                        station: station,
+                      };
+                    }
+                  );
+                  const stationClass = `${data?.color}-${data?.stations.length}`;
+                  return (
+                    <MarkerFeature
+                      key={stationClass}
+                      items={stations}
+                      markerColor={data.color}
+                      onSelectVizItem={handleSelectedVizItem}
+                      getPopupContent={getPopUpContent}
+                    />
+                  );
                 }
-
-                return null;
               })}
               <FrequencyDropdown
                 selectedValue={selectedFrequency}

@@ -5,12 +5,21 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MapboxContext = createContext();
 
-
-
-export const MapboxProvider = ({ children,config }) => {
+/**
+ * MapboxProvider
+ *
+ * React Context Provider that initializes a Mapbox GL map instance
+ * and makes it available to child components via `useMapbox` hook.
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - React children that will have access to the map context.
+ *
+ * @returns {JSX.Element}
+ */
+export const MapboxProvider = ({ children, config }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-    const accessToken = config?.mapboxToken
+  const accessToken = config?.mapboxToken
     ? config.mapboxToken
     : process.env.REACT_APP_MAPBOX_TOKEN;
   const mapboxStyleBaseUrl = config?.mapboxStyle
@@ -24,27 +33,55 @@ export const MapboxProvider = ({ children,config }) => {
   useEffect(() => {
     if (map.current) return;
 
+    // Validate required environment variables
+    if (!accessToken) {
+      console.error(
+        'Mapbox access token is not set. Please set REACT_APP_MAPBOX_TOKEN in your environment variables.'
+      );
+      return;
+    }
+
     let mapboxStyleUrl = 'mapbox://styles/mapbox/streets-v12';
     if (mapboxStyleBaseUrl) {
       mapboxStyleUrl = `${mapboxStyleBaseUrl}/${BASEMAP_STYLES_MAPBOX_ID}`;
     }
 
-    mapboxgl.accessToken = accessToken;
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: mapboxStyleUrl,
-      center: [-98.771556, 32.967243], // Centered on the US
-      zoom: 4,
-      projection: 'equirectangular',
-      options: {
-        trackResize: true,
-      },
-    });
+    try {
+      // Set Mapbox access token
+      mapboxgl.accessToken = accessToken;
+      // Initialize map instance
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: mapboxStyleUrl,
+        center: [-98.771556, 32.967243], // Centered on the US
+        zoom: 4,
+        projection: 'equirectangular',
+        options: {
+          trackResize: true,
+        },
+      });
 
-    map.current.dragRotate.disable();
-    map.current.touchZoomRotate.disableRotation();
+      // Disable rotation interactions after style is loaded
+      map.current.on('style.load', () => {
+        map.current.dragRotate.disable();
+        map.current.touchZoomRotate.disableRotation();
+      });
 
-    return () => map.current.remove();
+      // Handle style loading errors
+      map.current.on('error', (e) => {
+        console.error('Mapbox error:', e);
+      });
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+
+    // Cleanup map instance on unmount
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
   }, []);
 
   return (
