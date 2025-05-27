@@ -19,7 +19,7 @@ export function FrequencyDropdown({ selectedValue, setSelectedValue, style }) {
           value={selectedValue}
           onChange={handleChange}
           displayEmpty
-          disablePortal
+          disableportal='true'
           inputProps={{ 'aria-label': 'Without label' }}
           MenuProps={{
             anchorOrigin: {

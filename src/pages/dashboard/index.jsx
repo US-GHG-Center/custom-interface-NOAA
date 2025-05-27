@@ -41,7 +41,7 @@ import {
   CloseButton,
   LineChart,
   ClearChart,
-} from '@components';
+} from '../../components';
 
 import styled from 'styled-components';
 
