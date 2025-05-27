@@ -28,3 +28,5 @@ yarn.lock
 package-lock.json
 dist/
 .parcel-*
+/lib/dist/
+lib/node_modules

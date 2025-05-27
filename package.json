@@ -2,6 +2,9 @@
   "name": "interface-template",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "lib"
+  ],
   "homepage": ".",
   "dependencies": {
     "@date-io/moment": "^3.0.0",
@@ -15,6 +18,7 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@mui/x-date-pickers": "^7.22.0",
+    "@swc/helpers": "^0.5.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -48,6 +52,7 @@
     "build": "dotenv -- node ./run-parcel.js build build",
     "clean": "rm -rf node_modules dist build yarn.lock .parcel-cache && yarn cache clean",
     "serve": "dotenv -- node ./run-parcel.js serve",
+    "build:lib": "yarn workspace test01-noaa build",
     "test": "craco test",
     "eject": "react-scripts eject",
     "format": "prettier --write .",
@@ -78,11 +83,13 @@
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "2.15.2",
+    "@parcel/packager-ts": "2.15.2",
+    "@parcel/transformer-typescript-types": "2.15.2",
     "@parcel/transformer-webmanifest": "2.15.2",
     "eslint": "^8.56.0",
-    "parcel": "^2.15.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
+    "parcel": "^2.15.1",
     "prettier": "^3.4.2"
   }
 }
