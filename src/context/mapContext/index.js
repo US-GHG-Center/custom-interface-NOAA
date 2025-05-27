@@ -5,14 +5,21 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MapboxContext = createContext();
 
-const accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
-const mapboxStyleBaseUrl = process.env.REACT_APP_MAPBOX_STYLE_URL;
-const BASEMAP_STYLES_MAPBOX_ID =
-  process.env.REACT_APP_BASEMAP_STYLES_MAPBOX_ID || 'cldu1cb8f00ds01p6gi583w1m';
 
-export const MapboxProvider = ({ children }) => {
+
+export const MapboxProvider = ({ children,config }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
+    const accessToken = config?.mapboxToken
+    ? config.mapboxToken
+    : process.env.REACT_APP_MAPBOX_TOKEN;
+  const mapboxStyleBaseUrl = config?.mapboxStyle
+    ? config.mapboxStyle
+    : process.env.REACT_APP_MAPBOX_STYLE_URL;
+  const BASEMAP_STYLES_MAPBOX_ID = config?.basemapStyle
+    ? config.basemapStyle
+    : process.env.REACT_APP_BASEMAP_STYLES_MAPBOX_ID ||
+      'cldu1cb8f00ds01p6gi583w1m';
 
   useEffect(() => {
     if (map.current) return;

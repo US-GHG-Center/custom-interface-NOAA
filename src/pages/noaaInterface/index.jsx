@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Dashboard } from '../dashboard/index.jsx';
@@ -7,31 +7,47 @@ import {
   dataTransformationStation,
   dataTransformCollection,
 } from './helper/dataTransform';
+import { getConfig, validateConfig } from '../../services/config.ts';
 
-
-const FEATURES_API_URL = process.env.REACT_APP_FEATURES_API_URL || '';
-const stationUrl = `${FEATURES_API_URL}/collections/public.noaa_glm_station_metadata/items`;
-const collectionUrl = `${FEATURES_API_URL}/collections`;
-
-export function DashboardContainer() {
+export function NoaaInterface({ config: userConfig = {} }) {
+  // Memoize the config to prevent unnecessary re-renders
+  const config = useMemo(() => {
+    const mergedConfig = getConfig(userConfig);
+    const isValidConfig = validateConfig(mergedConfig);
+    if (isValidConfig.result) {
+      return mergedConfig;
+    } else {
+      throw new Error(
+        `Missing required configuration fields ${isValidConfig.missingFields} `
+      );
+    }
+  }, [userConfig]);
   const [selectedStationId, setSelectedStationId] = useState('');
   const [stations, setStations] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingChartData, setLoadingChartData] = useState(false);
 
+  const FEATURES_API_URL = config?.featuresApiUrl
+    ? config.featuresApiUrl
+    : process.env.REACT_APP_FEATURES_API_URL || '';
+  const stationUrl = `${FEATURES_API_URL}/collections/public.noaa_glm_station_metadata/items`;
+  const collectionUrl = `${FEATURES_API_URL}/collections`;
 
   // get the query params
   const [searchParams, setSearchParams] = useSearchParams();
   const [agency] = useState(searchParams.get('agency') || 'noaa'); // nist, noaa, or nasa
   const [ghg, setSelectedGHG] = useState(searchParams.get('ghg') || 'co2'); // co2 or ch4
   const [stationCode] = useState(searchParams.get('station-code') || ''); // buc, smt, etc
-  const [zoomLevel, setZoomLevel] = useState(searchParams.get('zoom-level')); // let default zoom level controlled by map component
+  const [zoomLevel, setZoomLevel] = useState(
+    searchParams.get('zoom-level' || config?.defaultZoomLevel)
+  ); // let default zoom level controlled by map component
   const [zoomLocation, setZoomLocation] = useState(
-    searchParams.get('zoom-location') || []
+    searchParams.get('zoom-location' || config?.defaultZoomLocation) || []
   ); // let default zoom location be controlled by map component
-  const [selectedFrequency, setSelectedFrequency] = useState(searchParams.get('frequency') || 'all'); // continuous or non-continuous
+  const [selectedFrequency, setSelectedFrequency] = useState(
+    searchParams.get('frequency') || 'all'
+  ); // continuous or non-continuous
   const time_period = ['event', 'all', 'monthly', 'weekly', 'daily'];
-
 
   // fetch station date from Features API
   useEffect(() => {
@@ -39,10 +55,12 @@ export function DashboardContainer() {
       try {
         // Fetch and transform station metadata
         const stationApiResponse = await fetchAllFromFeaturesAPI(stationUrl);
-        const transformedStationData = dataTransformationStation(stationApiResponse);
+        const transformedStationData =
+          dataTransformationStation(stationApiResponse);
 
         // Fetch and transform collection data without mutating previous object
-        const collectionApiResponse = await fetchAllFromFeaturesAPI(collectionUrl);
+        const collectionApiResponse =
+          await fetchAllFromFeaturesAPI(collectionUrl);
         const updatedStationData = dataTransformCollection(
           collectionApiResponse,
           transformedStationData,
@@ -62,7 +80,6 @@ export function DashboardContainer() {
 
     fetchData();
   }, []);
-
 
   // Fetch datetime and value associated with collection item whenever a station is selected
   // This is done for all collection items of selected station
@@ -127,8 +144,15 @@ export function DashboardContainer() {
 
     // Update the URL without reloading the page
     setSearchParams(newParams);
-  }, [agency, ghg, stationCode, zoomLevel, zoomLocation, selectedFrequency, setSearchParams]);
-
+  }, [
+    agency,
+    ghg,
+    stationCode,
+    zoomLevel,
+    zoomLocation,
+    selectedFrequency,
+    setSearchParams,
+  ]);
 
   return (
     <Dashboard
@@ -145,6 +169,7 @@ export function DashboardContainer() {
       selectedFrequency={selectedFrequency}
       setSelectedFrequency={setSelectedFrequency}
       agency={agency}
+      config={config}
     />
   );
 }

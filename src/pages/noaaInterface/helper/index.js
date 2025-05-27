@@ -20,7 +20,6 @@ export const extractStationCollections = (
         collection.id.includes(ghg) &&
         collection.id.includes(dataCategory) &&
         collection.id.includes(region)
-
       ) {
         // TODO: remove later after the functionality to add properties in collections is implemented in Features API directly.
         let stationId = getStationId(collection.id);
@@ -33,7 +32,7 @@ export const extractStationCollections = (
   return filteredCollection;
 };
 
-export const extractMetaData = async (collections) => {
+export const extractMetaData = async (collections, config) => {
   // convention for metadata collection_id: public.<agency>_<data_category>_<region>_metadata
   // example: public.nist_testbed_lam_metadata
   let metaCollection = collections
@@ -44,8 +43,11 @@ export const extractMetaData = async (collections) => {
       return null;
     })
     .filter((elem) => elem);
+  const stacApiUrl = config?.stacApiUrl
+    ? config.stacApiUrl
+    : process.env.REACT_APP_STAC_API_URL;
   let resultPromise = metaCollection.map((collection) => {
-    let url = `${process.env.REACT_APP_STAC_API_URL}/collections/${collection.id}/items`;
+    let url = `${stacApiUrl}/collections/${collection.id}/items`;
     return fetchAllFromFeaturesAPI(url);
   });
   let metaDataCollectionItems = await Promise.all(resultPromise);

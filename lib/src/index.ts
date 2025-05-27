@@ -1,1 +1,2 @@
-export {DashboardContainer} from '../../src/pages/dashboardContainer'
+export { NoaaInterface } from '../../src/pages/noaaInterface';
+export type {NoaaInterfaceConfig} from '../../src/pages/noaaInterface/types'
