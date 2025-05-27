@@ -1,6 +1,6 @@
 {
   "name": "test01-noaa",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Nist Interface Library",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
