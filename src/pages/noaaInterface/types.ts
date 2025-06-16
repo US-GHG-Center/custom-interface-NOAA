@@ -1,5 +1,4 @@
 export interface NoaaInterfaceConfig {
-  stacApiUrl: string;
   mapboxToken: string;
   mapboxStyle: string;
   publicUrl: string;
