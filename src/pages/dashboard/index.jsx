@@ -45,6 +45,7 @@ import {
 import styled from 'styled-components';
 
 import './index.css';
+import { useConfig } from '../../context/configContext';
 
 const TITLE = 'NOAA: ESRL Global Monitoring Laboratory';
 
@@ -68,12 +69,9 @@ export function Dashboard({
   selectedFrequency,
   setSelectedFrequency,
   agency,
-  config,
+  
 }) {
-  const FEATURES_API_URL = config?.featuresApiUrl
-    ? config.featuresApiUrl
-    : process.env.REACT_APP_FEATURES_API_URL || '';
-
+  const { config } = useConfig();
   // states for data
   const [vizItems, setVizItems] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -258,7 +256,7 @@ export function Dashboard({
           order={1}
         >
           <div id='dashboard-map-container'>
-            <MainMap config={config}>
+            <MainMap>
               <Paper
                 className='title-wrapper'
                 sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
