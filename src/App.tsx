@@ -9,7 +9,7 @@ import './App.css';
 
 const BASE_PATH = process.env.PUBLIC_URL;
 
-function App() {
+export function App() {
   return (
     <Fragment>
       <CssBaseline />
@@ -23,5 +23,3 @@ function App() {
     </Fragment>
   );
 }
-
-export default App;
