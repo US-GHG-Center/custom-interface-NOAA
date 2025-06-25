@@ -1,11 +1,18 @@
-import React from "react";
-import { DashboardContainer } from "../dashboardContainer";
-import { ConfigProvider } from "../../context/configContext";
+import React from 'react';
+import { DashboardContainer } from '../dashboardContainer';
+import { ConfigProvider } from '../../context/configContext';
 
-export function NoaaInterface({ config = {} }) {
+export function NoaaInterface({
+  config = {},
+  defaultZoomLocation,
+  defaultZoomLevel,
+}) {
   return (
     <ConfigProvider userConfig={config}>
-      <DashboardContainer />
+      <DashboardContainer
+        defaultZoomLocation={defaultZoomLocation}
+        defaultZoomLevel={defaultZoomLevel}
+      />
     </ConfigProvider>
   );
 }

@@ -9,7 +9,7 @@ import {
 } from './helper/dataTransform.ts';
 import { useConfig } from '../../context/configContext/index.jsx';
 
-export function DashboardContainer() {
+export function DashboardContainer({ defaultZoomLocation, defaultZoomLevel }) {
   // Memoize the config to prevent unnecessary re-renders
   const { config } = useConfig();
   const [selectedStationId, setSelectedStationId] = useState('');
@@ -28,10 +28,10 @@ export function DashboardContainer() {
   const [ghg, setSelectedGHG] = useState(searchParams.get('ghg') || 'co2'); // co2 or ch4
   const [stationCode] = useState(searchParams.get('station-code') || ''); // buc, smt, etc
   const [zoomLevel, setZoomLevel] = useState(
-    searchParams.get('zoom-level' || config?.defaultZoomLevel)
+    searchParams.get('zoom-level' || defaultZoomLevel)
   ); // let default zoom level controlled by map component
   const [zoomLocation, setZoomLocation] = useState(
-    searchParams.get('zoom-location' || config?.defaultZoomLocation) || []
+    searchParams.get('zoom-location' || defaultZoomLocation) || []
   ); // let default zoom location be controlled by map component
   const [selectedFrequency, setSelectedFrequency] = useState(
     searchParams.get('frequency') || 'all'
