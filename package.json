@@ -1,6 +1,6 @@
 {
-  "name": "test01-noaa",
-  "version": "1.0.8",
+  "name": "noaa-interface",
+  "version": "0.1.0",
   "private": false,
   "publishConfig": {
     "access": "public"
