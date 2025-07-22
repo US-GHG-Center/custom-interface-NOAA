@@ -1,9 +1,6 @@
 import { Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import CssBaseline from '@mui/material/CssBaseline';
-import { NoaaInterface } from './pages/noaaInterface';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { NoaaInterfaceContainer } from './pages/noaaInterface';
 
 import './App.css';
 
@@ -13,22 +10,19 @@ const defaultZoomLevel = 4;
 function App() {
   return (
     <Fragment>
-      <CssBaseline />
-      <LocalizationProvider dateAdapter={AdapterMoment}>
-        <BrowserRouter basename={BASE_PATH}>
-          <Routes>
-            <Route
-              path='/'
-              element={
-                <NoaaInterface
-                  defaultZoomLocation={defaultZoomLocation}
-                  defaultZoomLevel={defaultZoomLevel}
-                />
-              }
-            ></Route>
-          </Routes>
-        </BrowserRouter>
-      </LocalizationProvider>
+      <BrowserRouter basename={BASE_PATH}>
+        <Routes>
+          <Route
+            path='/'
+            element={
+              <NoaaInterfaceContainer
+                defaultZoomLocation={defaultZoomLocation}
+                defaultZoomLevel={defaultZoomLevel}
+              />
+            }
+          ></Route>
+        </Routes>
+      </BrowserRouter>
     </Fragment>
   );
 }

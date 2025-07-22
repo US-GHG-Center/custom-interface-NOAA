@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import { Dashboard } from '../dashboard/index.jsx';
 import { fetchAllFromFeaturesAPI } from '../../services/api.js';
@@ -9,7 +8,14 @@ import {
 } from './helper/dataTransform.ts';
 import { useConfig } from '../../context/configContext/index.jsx';
 
-export function DashboardContainer({ defaultZoomLocation, defaultZoomLevel }) {
+export function DashboardContainer({
+  defaultZoomLocation,
+  defaultZoomLevel,
+  defaultAgency,
+  defaultGhg,
+  defaultSelectedFrequency,
+  defaultStationCode,
+}) {
   // Memoize the config to prevent unnecessary re-renders
   const { config } = useConfig();
   const [selectedStationId, setSelectedStationId] = useState('');
@@ -23,18 +29,14 @@ export function DashboardContainer({ defaultZoomLocation, defaultZoomLevel }) {
   const collectionUrl = `${FEATURES_API_URL}/collections`;
 
   // get the query params
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [agency] = useState(searchParams.get('agency') || 'noaa'); // nist, noaa, or nasa
-  const [ghg, setSelectedGHG] = useState(searchParams.get('ghg') || 'co2'); // co2 or ch4
-  const [stationCode] = useState(searchParams.get('station-code') || ''); // buc, smt, etc
-  const [zoomLevel, setZoomLevel] = useState(
-    searchParams.get('zoom-level' || defaultZoomLevel)
-  ); // let default zoom level controlled by map component
-  const [zoomLocation, setZoomLocation] = useState(
-    searchParams.get('zoom-location' || defaultZoomLocation) || []
-  ); // let default zoom location be controlled by map component
+  
+  const [agency] = useState(defaultAgency|| 'noaa'); // nist, noaa, or nasa
+  const [ghg, setSelectedGHG] = useState(defaultGhg || 'co2'); // co2 or ch4
+  const [stationCode] = useState(defaultStationCode || ''); // buc, smt, etc
+  const [zoomLevel, setZoomLevel] = useState(defaultZoomLevel || 4); // let default zoom level controlled by map component
+  const [zoomLocation, setZoomLocation] = useState(defaultZoomLocation || []); // let default zoom location be controlled by map component
   const [selectedFrequency, setSelectedFrequency] = useState(
-    searchParams.get('frequency') || 'all'
+    defaultSelectedFrequency || 'all'
   ); // continuous or non-continuous
   const time_period = ['event', 'all', 'monthly', 'weekly', 'daily'];
 
