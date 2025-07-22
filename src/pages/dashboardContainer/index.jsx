@@ -124,27 +124,7 @@ export function DashboardContainer({
     fetchCollectionItemValue();
   }, [selectedStationId]);
 
-  // Update the search params whenever a state value changes
-  useEffect(() => {
-    const newParams = new URLSearchParams();
-
-    // Set new search params based on current state
-    if (agency) newParams.set('agency', agency);
-    if (ghg) newParams.set('ghg', ghg);
-    if (stationCode) newParams.set('station-code', stationCode);
-    if (selectedFrequency) newParams.set('frequency', selectedFrequency);
-
-    // Update the URL without reloading the page
-    setSearchParams(newParams);
-  }, [
-    agency,
-    ghg,
-    stationCode,
-    zoomLevel,
-    zoomLocation,
-    selectedFrequency,
-    setSearchParams,
-  ]);
+ 
 
   return (
     <Dashboard
