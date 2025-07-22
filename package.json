@@ -1,6 +1,6 @@
 {
   "name": "test01-noaa",
-  "version": "1.0.8",
+  "version": "0.1.6",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -42,6 +42,8 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@mui/x-date-pickers": "^7.22.0",
+    "@parcel/packager-ts": "2.15.4",
+    "@parcel/transformer-typescript-types": "2.15.4",
     "@swc/helpers": "^0.5.3",
     "@turf/turf": "^7.1.0",
     "chart.js": "^4.4.3",
@@ -90,7 +92,6 @@
     "chartjs-plugin-annotation": "^3.0.1",
     "chartjs-plugin-zoom": "^2.0.1",
     "d3": "^7.9.0",
-    "dotenv-cli": "^8.0.0",
     "luxon": "^3.5.0",
     "mapbox-gl": "^3.7.0",
     "mapboxgl-timeline": "^1.0.2",

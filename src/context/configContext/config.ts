@@ -6,15 +6,12 @@ import { NoaaInterfaceConfig } from '../../pages/noaaInterface/types';
  */
 
 const defaultConfig: NoaaInterfaceConfig = {
-  publicUrl: process.env.PUBLIC_URL || '',
   mapboxToken: process.env.REACT_APP_MAPBOX_TOKEN || '',
   mapboxStyle: process.env.REACT_APP_MAPBOX_STYLE_URL || '',
   basemapStyle:
     process.env.REACT_APP_BASEMAP_STYLES_MAPBOX_ID ||
     'cldu1cb8f00ds01p6gi583w1m',
   featuresApiUrl: process.env.REACT_APP_FEATURES_API_URL || '',
-  defaultZoomLocation: [-98.771556, 32.967243],
-  defaultZoomLevel: 4,
 };
 
 /**
