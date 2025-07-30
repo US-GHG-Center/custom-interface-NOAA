@@ -61,7 +61,7 @@ Once your environment variables are set, use the following commands:
 
 ## Bundling as a Library
 
-You can package `noaa-interface` as a reusable library for distribution via the [npm registry](https://www.npmjs.com/).
+You can package `custom-interface-noaa` as a reusable library for distribution via the [npm registry](https://www.npmjs.com/).
 
 ### 1. Build the Library
 
@@ -98,7 +98,7 @@ npm publish
 **Note:**
 
 > - Make sure your package name is unique if it's public.
-> - Consider using [scoped packages](https://docs.npmjs.com/cli/v10/using-npm/scope) (e.g., `@your-org/noaa-interface`) for organization or private packages.
+> - Consider using [scoped packages](https://docs.npmjs.com/cli/v10/using-npm/scope) (e.g., `@your-org/custom-interface-noaa`) for organization or private packages.
 > - For more details, see the [npm publishing guide](https://docs.npmjs.com/cli/v10/commands/npm-publish).
 
 ---
@@ -114,9 +114,9 @@ NOAA interface can also be used as a library within other React applications.
 Install the library via npm or yarn:
 
 ```bash
-npm install noaa-interface
+npm install custom-interface-noaa
 # or
-yarn add noaa-interface
+yarn add custom-interface-noaa
 ```
 
 ## Usage
@@ -124,7 +124,7 @@ yarn add noaa-interface
 ### Import NOAA Interface:
 
 ```JavaScript
-import { NoaaInterface } from 'noaa-interface';
+import { NoaaInterface } from 'custom-interface-noaa';
 ```
 
 ### Create a Configuration Variable:
@@ -140,16 +140,15 @@ const defaultConfig = {
   basemapStyle: "xxxxxxxxx",
   featuresApiUrl: "xxxxxxxxx",
 };
-const defaultZoomLocation = [number,number];
-const defaultZoomLevel = number;
+
 
 ```
 
 ### Add some default map configuration to start with
 
 ```Javascript
-const defaultZoomLocation = [number,number];
-const defaultZoomLevel = number;
+const defaultZoomLocation:[number,number] = [-98.771556, 32.967243];
+const defaultZoomLevel:number= 4;
 ```
 
 ### Use the CloudBrowse Component:
