@@ -5,9 +5,8 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { measurementLegend } from '../../constants';
 
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMessage } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMessage } from '@fortawesome/free-regular-svg-icons';
 
 import {
   categorizeStations,
@@ -41,14 +40,14 @@ import {
   CloseButton,
   LineChart,
   ClearChart,
-} from '@components';
+} from '../../components';
 
 import styled from 'styled-components';
 
 import './index.css';
+import { useConfig } from '../../context/configContext';
 
 const TITLE = 'NOAA: ESRL Global Monitoring Laboratory';
-const FEATURES_API_URL = process.env.REACT_APP_FEATURES_API_URL || '';
 
 const HorizontalLayout = styled.div`
   width: 90%;
@@ -70,7 +69,9 @@ export function Dashboard({
   selectedFrequency,
   setSelectedFrequency,
   agency,
+  
 }) {
+  const { config } = useConfig();
   // states for data
   const [vizItems, setVizItems] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -86,7 +87,7 @@ export function Dashboard({
 
   const prevChartDataRef = useRef([]);
 
-
+  const logo = new URL('../../noaa-logo.png', import.meta.url);
   // handler functions
   const handleSelectedVizItem = (vizItemId) => {
     if (nrtStationCodes.includes(vizItemId) && ghg === 'co2') {
@@ -101,7 +102,7 @@ export function Dashboard({
     setDisplayChart(false);
     setSelectedStationId(null);
     setIsNrtStation(false);
-  }
+  };
 
   const handleClearComplete = () => {
     setClearChart(false);
@@ -111,24 +112,30 @@ export function Dashboard({
   // Handle special case of NRT dataset
 
   // fetch nrt/station_meta.js and add station_codes to nrtStationCodes
-  const nrtStationCodes = [...new Set(nrtStations.map((station) => station.stationCode))];
+  const nrtStationCodes = [
+    ...new Set(nrtStations.map((station) => station.stationCode)),
+  ];
 
   // update nrtStationMeta state if the station is NRT station
   useEffect(() => {
     if (!isNrtStation) return;
 
-    const selectedNrtStation = nrtStations.find(station => station.stationCode === selectedStationId);
+    const selectedNrtStation = nrtStations.find(
+      (station) => station.stationCode === selectedStationId
+    );
     setNrtStationMeta(selectedNrtStation || null); // Override with the current station or null if not found
-
   }, [isNrtStation, selectedStationId]);
-
 
   // update legend based on the vizItems and selectedFrequency
   useEffect(() => {
     if (Array.isArray(vizItems)) {
       const newLegendData = vizItems
-        .filter(item => selectedFrequency === 'all' || Object.keys(item)[0] === selectedFrequency)
-        .map(item => {
+        .filter(
+          (item) =>
+            selectedFrequency === 'all' ||
+            Object.keys(item)[0] === selectedFrequency
+        )
+        .map((item) => {
           const category = Object.keys(item)[0];
           return {
             text: measurementLegend[category].shortText,
@@ -139,7 +146,6 @@ export function Dashboard({
     }
   }, [vizItems, selectedFrequency]);
 
-
   // update the chart data whenever selected station, data frequency or vizItems changes
   useEffect(() => {
     if (!selectedStationId || !vizItems) return;
@@ -149,7 +155,10 @@ export function Dashboard({
     // First, check if the station exists in 'continuous' category and then non_continuous category
     // This is because the Station is continous if it has both continous and non_continous values
     const continuousCategory = vizItems.find((item) => item['continuous']);
-    if (continuousCategory && continuousCategory.continuous.stations[selectedStationId]) {
+    if (
+      continuousCategory &&
+      continuousCategory.continuous.stations[selectedStationId]
+    ) {
       selectedCategory = continuousCategory;
     }
 
@@ -159,21 +168,25 @@ export function Dashboard({
 
     if (selectedCategory) {
       const categoryKey = Object.keys(selectedCategory)[0]; // Extract category name
-      const selectedStation = selectedCategory[categoryKey].stations[selectedStationId];
+      const selectedStation =
+        selectedCategory[categoryKey].stations[selectedStationId];
       const processedChartData = [];
       if (selectedStation?.collection_items) {
         selectedStation.collection_items.forEach((item) => {
           if (item.datetime && item.value) {
             processedChartData.push({
               id: item.id,
-              label: Array.isArray(item.datetime) ? item.datetime : [item.datetime],
+              label: Array.isArray(item.datetime)
+                ? item.datetime
+                : [item.datetime],
               value: Array.isArray(item.value) ? item.value : [item.value],
               color: getChartColor(item) || '#1976d2',
               legend: getChartLegend(item),
               labelX: 'Observation Date/Time (UTC)',
               labelY: getYAxisLabel(item),
               // todo: rename it to connect points
-              displayLine: item.time_period === 'monthly' || item.time_period === 'yearly',
+              displayLine:
+                item.time_period === 'monthly' || item.time_period === 'yearly',
             });
           }
         });
@@ -184,30 +197,41 @@ export function Dashboard({
       setDisplayChart(false);
     }
 
-    if (nrtStationMeta && (nrtStationMeta.stationCode === selectedStationId)) {
-      handleSpecialCases(stationData, isNrtStation, nrtStationMeta, setChartData);
+    if (nrtStationMeta && nrtStationMeta.stationCode === selectedStationId) {
+      handleSpecialCases(
+        stationData,
+        isNrtStation,
+        nrtStationMeta,
+        setChartData,
+        config
+      );
     }
 
     // Set data access URL
     setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
   }, [selectedStationId, vizItems, selectedFrequency]);
 
-
   // set vizItems when stationData or data frequency changes
   useEffect(() => {
     if (!stationData) return;
 
-    const categorizedData = categorizeStations(stationData, measurementLegend, selectedFrequency, ghg);
+    const categorizedData = categorizeStations(
+      stationData,
+      measurementLegend,
+      selectedFrequency,
+      ghg
+    );
     setVizItems(categorizedData);
   }, [stationData, selectedFrequency]);
-
 
   // set displayChart to true chartData is populated
   useEffect(() => {
     const prev = prevChartDataRef.current;
 
-    const isSubset = prev.every(prevItem =>
-      chartData.some(currItem => JSON.stringify(currItem) === JSON.stringify(prevItem))
+    const isSubset = prev.every((prevItem) =>
+      chartData.some(
+        (currItem) => JSON.stringify(currItem) === JSON.stringify(prevItem)
+      )
     );
 
     const isChanged = JSON.stringify(prev) !== JSON.stringify(chartData);
@@ -233,31 +257,44 @@ export function Dashboard({
         >
           <div id='dashboard-map-container'>
             <MainMap>
-              <Paper className='title-wrapper' sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+              <Paper
+                className='title-wrapper'
+                sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+              >
                 <Title title={TITLE} ghg={ghg} frequency={selectedFrequency} />
               </Paper>
-              <img src={process.env.PUBLIC_URL + "/noaa-logo.png"} alt="NOAA" className='logo' />
+              <img src={logo} alt='NOAA' className='logo' />
 
               <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
               {vizItems.map((item) => {
                 const [category, data] = Object.entries(item)[0];
-                console.log({ data });
-
-                if (selectedFrequency === "all" || selectedFrequency === category) {
-                  return Object.values(data.stations).map((station) => {
-                    return (
-                      <MarkerFeature
-                        key={station.id}
-                        items={[station]}
-                        onSelectVizItem={handleSelectedVizItem}
-                        markerColor={data.color}
-                        getPopupContent={getPopUpContent}
-                      />
-                    );
-                  });
+                if (
+                  selectedFrequency === 'all' ||
+                  selectedFrequency === category
+                ) {
+                  const stations = Object.values(data.stations).map(
+                    (station) => {
+                      return {
+                        id: station?.id,
+                        coordinates: {
+                          lon: station?.geometry?.coordinates[0][0][0],
+                          lat: station?.geometry?.coordinates[0][0][1],
+                        },
+                        station: station,
+                      };
+                    }
+                  );
+                  const stationClass = `${data?.color}-${data?.stations.length}`;
+                  return (
+                    <MarkerFeature
+                      key={stationClass}
+                      items={stations}
+                      markerColor={data.color}
+                      onSelectVizItem={handleSelectedVizItem}
+                      getPopupContent={getPopUpContent}
+                    />
+                  );
                 }
-
-                return null;
               })}
               <FrequencyDropdown
                 selectedValue={selectedFrequency}
@@ -290,29 +327,31 @@ export function Dashboard({
                 <ChartInstruction />
               </ChartToolsLeft>
               <ChartToolsRight>
-                {isNrtStation && nrtStationMeta &&
+                {isNrtStation && nrtStationMeta && (
                   <DataAccessTool
                     dataAccessLink={nrtStationMeta.source}
-                    tooltip="Access NRT Dataset"
+                    tooltip='Access NRT Dataset'
                   />
-                }
-                {dataAccessURL &&
+                )}
+                {dataAccessURL && (
                   <DataAccessTool
                     dataAccessLink={dataAccessURL}
-                    tooltip="Access NOAA Dataset"
+                    tooltip='Access NOAA Dataset'
                   />
-                }
+                )}
                 <ZoomResetTool />
                 <CloseButton handleClose={handleChartClose} />
               </ChartToolsRight>
             </ChartTools>
 
-
             {/* Main chart container */}
-            <ChartTitle>{
-              selectedStationId ?
-                stationData[selectedStationId].meta?.site_name + ' (' + selectedStationId + ')' :
-                'Chart'}
+            <ChartTitle>
+              {selectedStationId
+                ? stationData[selectedStationId].meta?.site_name +
+                  ' (' +
+                  selectedStationId +
+                  ')'
+                : 'Chart'}
             </ChartTitle>
             {clearChart && <ClearChart onDone={handleClearComplete} />}
             {loadingChartData && <LoadingSpinner />}
@@ -332,7 +371,7 @@ export function Dashboard({
               ))}
           </MainChart>
         </Panel>
-        {isNrtStation && nrtStationMeta &&
+        {isNrtStation && nrtStationMeta && (
           <div
             className='nrt-station-note-container'
             style={{ display: displayChart ? 'block' : 'none' }}
@@ -340,9 +379,9 @@ export function Dashboard({
             <FontAwesomeIcon icon={faMessage} /> <b>Note</b>
             <div className='nrt-station-note'>{nrtStationMeta.notice}</div>
           </div>
-        }
+        )}
       </PanelGroup>
-      {(loadingData) && <LoadingSpinner />}
+      {loadingData && <LoadingSpinner />}
     </Box>
   );
 }
