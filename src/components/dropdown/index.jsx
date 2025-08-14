@@ -30,7 +30,6 @@ export function FrequencyDropdown({ selectedValue, setSelectedValue, style }) {
               vertical: "bottom",
               horizontal: "left",
             },
-            getContentAnchorEl: null,
           }}
         >
           <MenuItem key={"all"} value={"all"}>
