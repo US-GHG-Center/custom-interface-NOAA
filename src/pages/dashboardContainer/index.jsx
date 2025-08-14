@@ -1,53 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
 
 import { Dashboard } from '../dashboard/index.jsx';
-import { fetchAllFromFeaturesAPI } from '../../services/api';
+import { fetchAllFromFeaturesAPI } from '../../services/api.js';
 import {
   dataTransformationStation,
   dataTransformCollection,
-} from './helper/dataTransform';
+} from './helper/dataTransform.ts';
+import { useConfig } from '../../context/configContext/index.jsx';
 
-
-const FEATURES_API_URL = process.env.REACT_APP_FEATURES_API_URL || '';
-const stationUrl = `${FEATURES_API_URL}/collections/public.noaa_glm_station_metadata/items`;
-const collectionUrl = `${FEATURES_API_URL}/collections`;
-
-export function DashboardContainer() {
+export function DashboardContainer({
+  defaultZoomLocation,
+  defaultZoomLevel,
+  defaultAgency,
+  defaultGhg,
+  defaultSelectedFrequency,
+  defaultStationCode,
+}) {
+  // Memoize the config to prevent unnecessary re-renders
+  const { config } = useConfig();
   const [selectedStationId, setSelectedStationId] = useState('');
   const [stations, setStations] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadingChartData, setLoadingChartData] = useState(false);
+
+  const FEATURES_API_URL = config?.featuresApiUrl;
+
+  const stationUrl = `${FEATURES_API_URL}/collections/public.noaa_glm_station_metadata/items`;
+  const collectionUrl = `${FEATURES_API_URL}/collections`;
 
   // get the query params
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [agency] = useState(searchParams.get('agency') || 'noaa'); // nist, noaa, or nasa
-  const [ghg, setSelectedGHG] = useState(searchParams.get('ghg') || 'co2'); // co2 or ch4
-  const [stationCode] = useState(searchParams.get('station-code') || ''); // buc, smt, etc
-  const [zoomLevel, setZoomLevel] = useState(searchParams.get('zoom-level')); // let default zoom level controlled by map component
-  const [zoomLocation, setZoomLocation] = useState(
-    searchParams.get('zoom-location') || []
-  ); // let default zoom location be controlled by map component
-  const [selectedFrequency, setSelectedFrequency] = useState(searchParams.get('frequency') || 'all'); // continuous or non-continuous
+  
+  const [agency] = useState(defaultAgency|| 'noaa'); // nist, noaa, or nasa
+  const [ghg, setSelectedGHG] = useState(defaultGhg || 'co2'); // co2 or ch4
+  const [stationCode] = useState(defaultStationCode || ''); // buc, smt, etc
+  const [zoomLevel, setZoomLevel] = useState(defaultZoomLevel || 4); // let default zoom level controlled by map component
+  const [zoomLocation, setZoomLocation] = useState(defaultZoomLocation || []); // let default zoom location be controlled by map component
+  const [selectedFrequency, setSelectedFrequency] = useState(
+    defaultSelectedFrequency || 'all'
+  ); // continuous or non-continuous
   const time_period = ['event', 'all', 'monthly', 'weekly', 'daily'];
-
 
   // fetch station date from Features API
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch and transform station metadata
-        console.log('Station URL-->', stationUrl);
         const stationApiResponse = await fetchAllFromFeaturesAPI(stationUrl);
-        const transformedStationData = dataTransformationStation(stationApiResponse);
-        // setStations(transformedStationData);
+        const transformedStationData =
+          dataTransformationStation(stationApiResponse);
 
-        // Fetch and transform collection data
-        const collectionApiResponse = await fetchAllFromFeaturesAPI(collectionUrl);
-        dataTransformCollection(collectionApiResponse, transformedStationData, agency, ghg, time_period);
+        // Fetch and transform collection data without mutating previous object
+        const collectionApiResponse = await fetchAllFromFeaturesAPI(
+          collectionUrl
+        );
+        const updatedStationData = dataTransformCollection(
+          collectionApiResponse,
+          transformedStationData,
+          agency,
+          ghg,
+          time_period
+        );
 
-        // todo: avoide mutation on data
-
-        setStations(transformedStationData);
+        // Set the final transformed station data
+        setStations(updatedStationData);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -67,62 +82,49 @@ export function DashboardContainer() {
       const selectedStation = stations[selectedStationId];
       if (!selectedStation?.collection_items) return;
 
-
-      // Create a deep copy of stations to avoid mutation
-      const updatedstations = { ...stations };
-      const updatedStation = { ...updatedstations[selectedStationId] };
-      updatedstations[selectedStationId] = updatedStation;
+      // Create a deep copy of stations and selected station
+      const updatedStations = { ...stations };
 
       try {
-        setLoading(true);
-        // Fetch missing datetime and values in parallel
-        await Promise.all(
-          selectedStation.collection_items.map(async (item, index) => {
-            if (!item.datetime || !item.value) {
-              try {
-                const response = await fetchAllFromFeaturesAPI(
-                  `${FEATURES_API_URL}/collections/${item.id}/items`
-                );
+        setLoadingChartData(true);
+        const updatedCollectionItems = await Promise.all(
+          selectedStation.collection_items.map(async (item) => {
+            if (item.datetime && item.value) return item;
 
-                if (response.length > 0) {
-                  item.datetime = response[0].properties.datetime;
-                  item.value = response[0].properties.value;
-                }
-              } catch (error) {
-                console.error(`Error fetching data for item ${item.id}:`, error);
-                return;
+            try {
+              const response = await fetchAllFromFeaturesAPI(
+                `${FEATURES_API_URL}/collections/${item.id}/items`
+              );
+
+              if (response.length > 0) {
+                const { datetime, value } = response[0].properties;
+                return { ...item, datetime, value };
               }
+            } catch (error) {
+              console.error(`Error fetching data for item ${item.id}:`, error);
             }
+
+            return item; // fallback to original item
           })
         );
 
-        // Update station data and chart data
-        setStations(updatedstations);
+        updatedStations[selectedStationId] = {
+          ...selectedStation,
+          collection_items: updatedCollectionItems,
+        };
+
+        setStations(updatedStations);
       } catch (error) {
         console.error('Error in fetchCollectionItemValue:', error);
       } finally {
-        setLoading(false);
+        setLoadingChartData(false);
       }
     };
 
     fetchCollectionItemValue();
   }, [selectedStationId]);
 
-
-  // Update the search params whenever a state value changes
-  useEffect(() => {
-    const newParams = new URLSearchParams();
-
-    // Set new search params based on current state
-    if (agency) newParams.set('agency', agency);
-    if (ghg) newParams.set('ghg', ghg);
-    if (stationCode) newParams.set('station-code', stationCode);
-    if (selectedFrequency) newParams.set('frequency', selectedFrequency);
-
-    // Update the URL without reloading the page
-    setSearchParams(newParams);
-  }, [agency, ghg, stationCode, zoomLevel, zoomLocation, selectedFrequency, setSearchParams]);
-
+ 
 
   return (
     <Dashboard
@@ -134,6 +136,7 @@ export function DashboardContainer() {
       zoomLevel={zoomLevel}
       zoomLocation={zoomLocation}
       loadingData={loading}
+      loadingChartData={loadingChartData}
       setLoadingData={setLoading}
       selectedFrequency={selectedFrequency}
       setSelectedFrequency={setSelectedFrequency}

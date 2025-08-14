@@ -1,7 +1,7 @@
 import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
-import { plugin } from '../components/mainChart/customPlugin';
-import { options } from '../components/mainChart/options';
+import { plugin } from '../../components/mainChart/customPlugin';
+import { options } from '../../components/mainChart/options';
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
 import 'chartjs-adapter-luxon';
@@ -49,8 +49,10 @@ export const ChartProvider = ({ children }) => {
 
   return (
     <ChartContext.Provider value={{ chart: chart }}>
+      <div className='chart-body-wrapper'>
       {children}
       <canvas ref={chartContainer} style={{ width: '100%', minHeight: '30%', position: 'absolute' }}></canvas>
+      </div>
     </ChartContext.Provider>
   );
 };

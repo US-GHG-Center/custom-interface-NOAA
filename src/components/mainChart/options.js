@@ -1,6 +1,6 @@
 import 'chartjs-adapter-luxon';
 
-export const ghgBlue = "#082A63";
+export const ghgBlue = "#222fbf";
 
 export const options = {
   responsive: true,
@@ -59,7 +59,7 @@ export const options = {
       },
       font: {
         size: 24,
-        family: "Roboto",
+        family: "DM Sans",
         weight: "bold",
       },
       color: ghgBlue,

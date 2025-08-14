@@ -6,6 +6,7 @@ export const Title = ({ title, frequency, ghg }) => {
   return (
     <>
       <Typography
+        variant='h6'
         component='div'
         className='title-text'
         sx={{

@@ -118,9 +118,9 @@ export const DataAccessTool = ({ dataAccessLink, tooltip }) => {
         rel="noreferrer"
         data-tooltip-id="data-access-tooltip"
         data-tooltip-content={tooltip}
-        class='data-access-tool'
+        className='data-access-tool'
       >
-        <FontAwesomeIcon icon={faExternalLink} />
+        {tooltip} <FontAwesomeIcon icon={faExternalLink} />
       </a>
       <Tooltip id="data-access-tooltip" place="bottom" style={tooltipStyle} />
     </>
