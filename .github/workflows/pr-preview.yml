@@ -48,8 +48,8 @@ jobs:
           # note: vars.PUBLIC_URL is expected to have leading and trailing /
           [ -z "${{ vars.DEPLOYMENT_BUCKET_REACT }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET_REACT")
           [ -z "${{ vars.DEPLOYMENT_REGION }}" ] && missing_vars+=("vars.DEPLOYMENT_REGION")
-          [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN_REACT }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN_REACT")
-          [ -z "${{ secrets.CF_DISTRIBUTION_ID_REACT }}" ] && missing_vars+=("secrets.CF_DISTRIBUTION_ID_REACT")
+          [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN")
+          [ -z "${{ secrets.CF_DISTRIBUTION_ID }}" ] && missing_vars+=("secrets.CF_DISTRIBUTION_ID")
           [ -z "${{ vars.PREVIEW_WEB_DISTRIBUTION_URL }}" ] && missing_vars+=("vars.PREVIEW_WEB_DISTRIBUTION_URL")`
           [ -z "${{ vars.REACT_APP_FEATURES_API_URL }}" ] && missing_vars+=("vars.REACT_APP_FEATURES_API_URL")`
           # If any variables are missing, print them and exit with an error
@@ -63,7 +63,7 @@ jobs:
       - name: Configure AWS Credentials 
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN_REACT }}
+          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE_ARN }}
           role-session-name: ${{ github.repository_owner}}
           aws-region: ${{vars.DEPLOYMENT_REGION}}
 
@@ -100,7 +100,7 @@ jobs:
       - name: Request Invalidation to AWS Cloudfront
         uses: oneyedev/aws-cloudfront-invalidation@v1
         with:
-          distribution-id: ${{ secrets.CF_DISTRIBUTION_ID_REACT }}
+          distribution-id: ${{ secrets.CF_DISTRIBUTION_ID }}
           paths: |
             ${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }}
   clean_up:
