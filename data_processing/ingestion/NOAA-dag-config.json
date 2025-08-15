@@ -1,0 +1,14 @@
+{
+    "bucket": "ghgc-data-store-develop",
+    "collection": "",
+    "extra_flags": [
+        "-overwrite"
+    ],
+    "filename_regex": ".*geojson",
+    "id_template": "{}",
+    "invalidate_cloudfront": true,
+    "prefix": "NOAA_features_API/",
+    "source_projection": "EPSG:4326",
+    "target_projection": "EPSG:4326",
+    "vector": true
+}
