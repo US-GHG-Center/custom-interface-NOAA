@@ -76,8 +76,8 @@ jobs:
         run: |
           yarn
           CI=false yarn build
-          echo "Syncing to s3://${{ env.S3_BUCKET }}${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }}"
-          aws s3 sync build/ s3://${{ env.S3_BUCKET }}${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }}
+          echo "Syncing to s3://${{ vars.DEPLOYMENT_BUCKET }}${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }}"
+          aws s3 sync build/ s3://${{ vars.DEPLOYMENT_BUCKET }}${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }}
           COMMENT+="- 🛰️ Pr-Preview on : ${{ vars.PREVIEW_WEB_DISTRIBUTION_URL }}${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }} \n \n"
           echo "COMMENT=${COMMENT}" >> $GITHUB_ENV
       - name: List build directory contents
