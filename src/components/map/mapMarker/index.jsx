@@ -61,7 +61,7 @@ export const MarkerFeature = ({
       // Create Mapbox marker
       const marker = new mapboxgl.Marker({
         element: el,
-        anchor: 'top',
+        anchor: 'center',
       }).setLngLat([lon, lat]);
 
       // Create popup if content provided
