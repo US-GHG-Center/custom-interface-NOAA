@@ -259,7 +259,7 @@ export function Dashboard({
             <MainMap>
               <Paper
                 className='title-wrapper'
-                sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+                sx={{ backgroundColor: 'rgba(255, 255, 255, 1)' }}
               >
                 <Title title={TITLE} ghg={ghg} frequency={selectedFrequency} />
               </Paper>

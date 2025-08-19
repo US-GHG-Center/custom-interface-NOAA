@@ -1,5 +1,5 @@
 .title-text {
-  color: var(--main-blue);
+  color: var(--heading-gray);
   text-align: left;
   padding: 0.7rem;
 }
@@ -10,7 +10,7 @@
   left: 0.9rem;
   max-width: 75%;
   width: auto;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 1);
   color: black;
   z-index: 999;
 }

@@ -2,7 +2,7 @@
   position: absolute;
   bottom: 0.9rem;
   right: 0.9rem;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 1);
   padding: .7rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
@@ -17,7 +17,7 @@
 .legend-title {
   font-weight: bold;
   margin-bottom: 4px;
-  color: var(--main-blue);
+  color: var(--heading-gray);
   font-size: 16px;
 }
 
