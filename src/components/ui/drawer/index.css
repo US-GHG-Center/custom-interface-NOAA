@@ -1,7 +1,7 @@
 .drawer-head {
-  color: var(--main-blue);
+  color: var(--heading-gray);
   text-align: center;
-  border-bottom: 2px solid var(--main-blue);
+  border-bottom: 2px solid var(--heading-gray);
   margin: 0 0.9rem;
 }
 
