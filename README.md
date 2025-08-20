@@ -132,9 +132,6 @@ import { NoaaInterface } from 'custom-interface-noaa';
 ```JavaScript
 
 const defaultConfig = {
-  stacApiUrl: "xxxxxxxxx",
-  rasterApiUrl: "xxxxxxxxx",
-  cloudBrowseUrl: "xxxxxxxxx",
   mapboxToken:"xxxxxxxxx",
   mapboxStyle: "xxxxxxxxx",
   basemapStyle: "xxxxxxxxx",
@@ -165,9 +162,6 @@ const defaultZoomLevel:number= 4;
 
 ```
 REACT_APP_FEATURES_API_URL='xxxxxxxxxxxx'
-REACT_APP_STAC_API_URL='xxxxxxxxxx'
-REACT_APP_BASE_STAC_API_URL='xxxxxxxxxx'
-REACT_APP_RASTER_API_URL='xxxxxxxxxx'
 PUBLIC_URL='xxxxxxxxxx'
 REACT_APP_MAPBOX_TOKEN='xxxxxxxxxx'
 REACT_APP_MAPBOX_STYLE_URL='xxxxxxxxxx'
