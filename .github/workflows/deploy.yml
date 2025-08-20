@@ -112,8 +112,8 @@ jobs:
 
       - name: Upload to S3
         run: |
-          echo "Deploying to "s3://${{vars.DEPLOYMENT_BUCKET}}${{ vars.PUBLIC_URL}}/"
-          aws s3 sync "./build" s3://${{vars.DEPLOYMENT_BUCKET}}${{vars.PUBLIC_URL}}/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+          echo "Deploying to s3://${{vars.DEPLOYMENT_BUCKET}}${{ vars.PUBLIC_URL}}"
+          aws s3 sync "./build" s3://${{vars.DEPLOYMENT_BUCKET}}${{vars.PUBLIC_URL}} --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
 
       - name: Request Invalidation to AWS Cloudfront
         uses: oneyedev/aws-cloudfront-invalidation@v1
