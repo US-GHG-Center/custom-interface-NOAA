@@ -47,7 +47,7 @@ import styled from 'styled-components';
 import './index.css';
 import { useConfig } from '../../context/configContext';
 
-const TITLE = 'NOAA: ESRL Global Monitoring Lab';
+const TITLE = 'NOAA: ESRL Global Monitoring Laboratory';
 
 const HorizontalLayout = styled.div`
   width: 90%;
