@@ -1,8 +1,10 @@
 import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
-import { plugin } from '../components/mainChart/customPlugin';
-import { options } from '../components/mainChart/options';
-import '../components/mainChart/config';
+import { plugin } from '../../components/mainChart/customPlugin';
+import { options } from '../../components/mainChart/options';
+import zoomPlugin from "chartjs-plugin-zoom";
+import annotationPlugin from "chartjs-plugin-annotation";
+import 'chartjs-adapter-luxon';
 
 const ChartContext = createContext();
 
@@ -11,7 +13,11 @@ export const ChartProvider = ({ children }) => {
   const [chart, setChart] = useState(null);
 
   useEffect(() => {
-    if (chart) return;
+    if (chart || !chartContainer.current) return;
+
+    Chart.register(zoomPlugin);
+    Chart.register(annotationPlugin);
+    Chart.register(plugin);
 
     let dataset = {
       labels: [],
@@ -43,8 +49,10 @@ export const ChartProvider = ({ children }) => {
 
   return (
     <ChartContext.Provider value={{ chart: chart }}>
+      <div className='chart-body-wrapper'>
       {children}
       <canvas ref={chartContainer} style={{ width: '100%', minHeight: '30%', position: 'absolute' }}></canvas>
+      </div>
     </ChartContext.Provider>
   );
 };

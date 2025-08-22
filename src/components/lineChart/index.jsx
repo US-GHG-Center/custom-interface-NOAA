@@ -1,13 +1,24 @@
 import { useEffect } from 'react';
 import { useChart } from '../../context/chartContext';
 
-export const LineChart = ({ data, labels, legend, labelX, labelY, color="#ff6384", index=0, separateY=false }) => {
+export const LineChart = ({
+  data,
+  labels,
+  legend,
+  labelX,
+  labelY,
+  color = "#ff6384",
+  index = 0,
+  separateY = false,
+  separateX = false,
+  showLine = false,
+}) => {
   // data should be an array of vector points
   // labels should be an array of the vector labels
   const { chart } = useChart();
 
   useEffect(() => {
-    if (!chart || !data.length || !labels.length) return;
+    if (!chart || !data || !labels) return;
 
     // first reset the zoom
     chart.resetZoom();
@@ -15,15 +26,13 @@ export const LineChart = ({ data, labels, legend, labelX, labelY, color="#ff6384
 
     const newDataset = {
       label: legend,
-      data: data,
-      backgroundColor: color + '20',
+      data: data.map((value, i) => ({ x: new Date(labels[i]), y: value })),
+      backgroundColor: color.replace(/[\d.]+\)$/g, '0.2)'),
       borderColor: color,
-      showLine: false,
-      xAxisID: `x-${index}`,
+      showLine: showLine,
+      xAxisID: separateX ? `x-${index}` : 'x',
+      yAxisID: separateX ? `y-${index}` : 'y',
     };
-    if (separateY) {
-      newDataset.yAxisID = `y-${index}`;
-    }
 
     // Ensure datasets array exists
     if (!chart.data.datasets) {
@@ -34,53 +43,63 @@ export const LineChart = ({ data, labels, legend, labelX, labelY, color="#ff6384
     chart.data.datasets[index] = newDataset;
 
     // Update the labels
-    chart.data.labels = labels;
+    // chart.data.labels = labels;
 
     // update the axis labels
-    chart.options.scales.y.display = separateY?false:true;
-    chart.options.scales.x.display = false;
+    chart.options.scales.y.display = separateY ? false : true;
+    chart.options.scales.x.display = separateX ? false : true;
 
     // Ensure scales object exists
     if (!chart.options.scales) {
       chart.options.scales = {};
     }
 
-    // Add scale configurations for x and y axes
-    chart.options.scales[`x-${index}`] = {
-      type: 'category',
-      labels: labels,
+    // Centralized x-axis scale configuration
+    const xAxisConfig = {
+      type: 'time',
       display: true,
+      time: {
+        tooltipFormat: 'dd MMM yyyy', // for tooltips
+        unit: false, // let it auto-determine
+      },
       grid: {
         display: false,
         drawOnChartArea: false,
-        // color: color,
       },
       ticks: {
-        labels,
+        source: 'auto',
+        autoSkip: true,
+        maxTicksLimit: 10,
       },
       title: {
         text: labelX,
         display: !!labelX,
-        // color: color
-      }
+      },
+      adapters: {
+        date: {
+          zone: 'UTC',
+        },
+      },
     };
 
-    chart.options.scales[`y-${index}`] = {
-      display: separateY?true:false,
+    // Assign the x-axis configuration based on the separateX flag
+    chart.options.scales[separateX ? `x-${index}` : 'x'] = xAxisConfig;
+
+    const yAxisConfig = {
+      display: true,
       grid: {
-        display: false,
-        drawOnChartArea: false,
-        // color: color,
-      },
-      ticks: {
-        // color: color,
+        display: true,
+        drawOnChartArea: true,
       },
       title: {
         text: labelY,
         display: !!labelY,
-        // color: color
       }
     };
+
+    // Assign the x-axis configuration based on the separateX flag
+    chart.options.scales[separateX ? `y-${index}` : 'y'] = yAxisConfig;
+
 
     // update the chart
     chart.update();

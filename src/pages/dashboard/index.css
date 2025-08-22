@@ -29,17 +29,14 @@
 
 .logo {
   position: fixed;
-  top: 1%;
-  right: 1%;
-  width: 275px;
+  top: .7rem;
+  right: .7rem;
+  width: 80px;
   height: auto;
-  padding: 10px 24px;
   color: #082a63;
-  background-color: rgba(255, 255, 255);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
   z-index: 1000;
 }
+
 .map-icon {
   color: #ffffff;
 }
@@ -50,6 +47,7 @@ button.measure-icon {
   align-items: center;
   color: #000000;
 }
+
 button.change-unit {
   display: flex;
   font-size: medium;
@@ -57,13 +55,33 @@ button.change-unit {
   align-items: center;
   color: #000000;
 }
+
 button.clear-icon {
   display: flex;
   transform: rotate(90deg);
   align-items: center;
   color: #000000;
 }
+
 button.menu-open-icon {
   display: flex;
   align-items: center;
+}
+
+.nrt-station-note-container {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: #8251df;
+  font-size: .8rem;
+  z-index: 100000;
+}
+
+.nrt-station-note {
+  font-size: .8rem;
+  color: #222;
 }

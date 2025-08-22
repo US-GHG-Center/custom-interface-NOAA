@@ -1,4 +1,4 @@
-import { 
+import {
   Station,
   StationMeta,
   CollectionItem,
@@ -49,11 +49,20 @@ export function dataTransformationStation(stationData: any[]): Record<string, St
 }
 
 // Transform collections into CollectionItem objects and attach to respective stations
-export function dataTransformCollection(collectionsData: any[], stations: Record<string, Station>, agency_filter: String): void {
+export function dataTransformCollection(
+  collectionsData: any[],
+  stations: Record<string, Station>,
+  agency_filter: string,
+  ghg_filter: string,
+  time_period: string[]
+): Record<string, Station> {
   if (!Array.isArray(collectionsData)) {
     console.error("Invalid API response format: Expected an array");
-    return;
+    return stations;
   }
+
+  // Create a shallow copy of stations
+  const updatedStations: Record<string, Station> = { ...stations };
 
   collectionsData.forEach((collection: any) => {
     if (!collection.id) {
@@ -61,10 +70,9 @@ export function dataTransformCollection(collectionsData: any[], stations: Record
       return;
     }
 
-    const parts = collection.id.split('.')[1].split('_');
-    if (parts.length === 9) {
+    const parts = collection.id.split(".")[1].split("_");
+    if (parts.length === 8) {
       const [
-        prefix,
         agency,
         product,
         measurement_inst,
@@ -72,26 +80,47 @@ export function dataTransformCollection(collectionsData: any[], stations: Record
         sitecode,
         country,
         gas,
-        time_period
+        time_period_value,
       ] = parts;
 
       const siteCodeUpper = sitecode.toUpperCase();
-      const station = stations[siteCodeUpper];
+      const station = updatedStations[siteCodeUpper];
 
-      if (station && agency === agency_filter) {
-        const collectionItem: CollectionItem = {
-          id: collection.id,
-          gas: gas,
-          gas_full_name: gas,
-          product: product,
-          measurement_inst: measurement_inst,
-          methodology: methodology,
-          time_period: time_period,
-          link: collection.links?.[1]
+      if (
+        station &&
+        agency === agency_filter &&
+        time_period.includes(time_period_value)
+      ) {
+        const existingItems = station.collection_items || [];
+
+        // Filter and add only if gas matches filter
+        const newCollectionItems = existingItems
+          .filter((item) => item.gas === ghg_filter)
+          .concat(
+            gas === ghg_filter
+              ? [
+                {
+                  id: collection.id,
+                  gas,
+                  gas_full_name: gas,
+                  product,
+                  measurement_inst,
+                  methodology,
+                  time_period: time_period_value,
+                  link: collection.links?.[1],
+                },
+              ]
+              : []
+          );
+
+        // Create new station object with updated collection_items
+        updatedStations[siteCodeUpper] = {
+          ...station,
+          collection_items: newCollectionItems,
         };
-
-        station.collection_items?.push(collectionItem);
       }
     }
   });
+
+  return updatedStations;
 }
