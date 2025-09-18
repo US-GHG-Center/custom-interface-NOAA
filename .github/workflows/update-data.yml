@@ -61,7 +61,7 @@ jobs:
           [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN")
           [ -z "${{ vars.SM2A_API_URL }}" ] && missing_vars+=("vars.SM2A_API_URL")
           [ -z "${{ vars.DATASET_DAG_NAME }}" ] && missing_vars+=("vars.DATASET_DAG_NAME")
-          [ -z "${{ vars.DEPLOYMENT_BUCKET }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET")
+          [ -z "${{ vars.FEATU }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET")
 
           if [ ${#missing_vars[@]} -ne 0 ]; then
             echo "Error: The following required secrets or variables are missing:"
