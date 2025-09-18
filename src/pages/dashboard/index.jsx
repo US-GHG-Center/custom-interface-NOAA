@@ -69,7 +69,7 @@ export function Dashboard({
   selectedFrequency,
   setSelectedFrequency,
   agency,
-  
+
 }) {
   const { config } = useConfig();
   // states for data
