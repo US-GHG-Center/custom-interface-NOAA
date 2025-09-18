@@ -185,12 +185,22 @@ export function Dashboard({
               legend: getChartLegend(item),
               labelX: 'Observation Date/Time (UTC)',
               labelY: getYAxisLabel(item),
+              time_period: item.time_period,
               // todo: rename it to connect points
               displayLine:
                 item.time_period === 'monthly' || item.time_period === 'yearly',
             });
           }
         });
+
+        // Sort data to ensure proper layering: daily (bottom), monthly (middle), yearly (top)
+        const timePeriodOrder = { 'daily': 0, 'hourly': 0, 'weekly': 1, 'monthly': 2, 'yearly': 3, 'event': 4 };
+        processedChartData.sort((a, b) => {
+          const orderA = timePeriodOrder[a.time_period] ?? 5;
+          const orderB = timePeriodOrder[b.time_period] ?? 5;
+          return orderB - orderA;
+        });
+
         setChartData(processedChartData);
       }
     } else {
