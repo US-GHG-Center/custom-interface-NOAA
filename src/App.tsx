@@ -5,8 +5,8 @@ import { NoaaInterfaceContainer } from './pages/noaaInterface';
 import './App.css';
 
 const BASE_PATH = process.env.PUBLIC_URL;
-const defaultZoomLocation = [-98.771556, 32.967243];
-const defaultZoomLevel = 4;
+const defaultZoomLocation = [0, 0];
+const defaultZoomLevel = 2;
 export function App() {
   return (
     <Fragment>

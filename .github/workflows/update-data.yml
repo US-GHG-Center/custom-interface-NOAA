@@ -61,7 +61,7 @@ jobs:
           [ -z "${{ secrets.DEPLOYMENT_ROLE_ARN }}" ] && missing_vars+=("secrets.DEPLOYMENT_ROLE_ARN")
           [ -z "${{ vars.SM2A_API_URL }}" ] && missing_vars+=("vars.SM2A_API_URL")
           [ -z "${{ vars.DATASET_DAG_NAME }}" ] && missing_vars+=("vars.DATASET_DAG_NAME")
-          [ -z "${{ vars.DEPLOYMENT_BUCKET }}" ] && missing_vars+=("vars.DEPLOYMENT_BUCKET")
+          [ -z "${{ vars.FEATURES_API_DATA_BUCKET }}" ] && missing_vars+=("vars.FEATURES_API_DATA_BUCKET")
 
           if [ ${#missing_vars[@]} -ne 0 ]; then
             echo "Error: The following required secrets or variables are missing:"
@@ -85,7 +85,7 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 sync ./data/geojson s3://${{ vars.DEPLOYMENT_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
+          aws s3 sync ./data/geojson s3://${{ vars.FEATURES_API_DATA_BUCKET }}/NOAA_features_API/ --cache-control max-age=30,must-revalidate,s-maxage=604800 --delete
 
       - name: Remove local files
         run: |
