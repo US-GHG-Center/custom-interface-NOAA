@@ -87,7 +87,7 @@ export function getPopUpContent(station: Station): string {
     ${station.meta.site_country ? `<b>${station.meta.site_country}</b><br>` : ""}
     Latitude: ${lat}<br>
     Longitude: ${lon}<br>
-    Elevation: ${station.meta.site_elevation}<br>
+    Elevation: ${station.meta.site_elevation} masl<br>
     Measurement Type: ${uniqueMeasurements}
   `;
 }
