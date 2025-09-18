@@ -13,7 +13,9 @@ export const Title = ({ title, frequency, ghg }) => {
           fontWeight: 'bold',
         }}
       >
-        {title}: {ghg && greenhouseGases[ghg].fullName} {frequency && frequency !== 'all' && `${measurementLegend[frequency].text}`}
+        {title}: {ghg && greenhouseGases[ghg].fullName}
+        {frequency === 'all' && ` Concentration Measurements`}
+        {frequency && frequency !== 'all' && ` ${measurementLegend[frequency].text}`}
       </Typography>
     </>
   );
