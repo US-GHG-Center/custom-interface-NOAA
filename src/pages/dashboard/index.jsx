@@ -141,7 +141,8 @@ export function Dashboard({
             text: measurementLegend[category].shortText,
             color: item[category].color,
           };
-        });
+        })
+        .sort((a, b) => a.text.localeCompare(b.text));
       setLegendData(newLegendData);
     }
   }, [vizItems, selectedFrequency]);
