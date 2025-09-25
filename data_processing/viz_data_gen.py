@@ -92,6 +92,10 @@ def extact_viz_json(filepath, dest_filepath, f):
             time = filepath.split('/')[-1].split('.')[0].split('_')[-1].lower()
             time = next((value for key, value in time_mapping.items() if key in time), time)
 
+            # Special handling for MLO and MKO stations: ignore all the pfp files
+            if measuring_instr =='pfp' and station in ['MLO','MKO','mlo','mko']:
+                print(f"ignoring... noaa_glm_{measuring_instr}_{methodology}_{station}_{country}_{gas}_{time}" )
+                return
 
             filename = f"noaa_glm_{measuring_instr}_{methodology}_{station}_{country}_{gas}_{time}.csv"
 
