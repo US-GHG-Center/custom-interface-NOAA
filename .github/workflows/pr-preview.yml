@@ -71,6 +71,7 @@ jobs:
         env:
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
           REACT_APP_MAPBOX_STYLE_URL: ${{ secrets.REACT_APP_MAPBOX_STYLE_URL }}
+          REACT_APP_BASEMAP_STYLES_MAPBOX_ID: ${{ secrets.REACT_APP_BASEMAP_STYLES_MAPBOX_ID }}
           PUBLIC_URL: ${{ vars.PUBLIC_URL }}pr-preview-${{ github.event.number }}
           REACT_APP_FEATURES_API_URL: ${{ vars.REACT_APP_FEATURES_API_URL }}
         run: |
