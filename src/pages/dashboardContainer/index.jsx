@@ -25,7 +25,7 @@ export function DashboardContainer({
   const [loading, setLoading] = useState(true);
   const [loadingChartData, setLoadingChartData] = useState(false);
 
-  const isEmbedded = searchParams.get('viewMode') === 'simple';
+  const isSimpleView = searchParams.get('viewMode') === 'simple';
 
 
   const FEATURES_API_URL = config?.featuresApiUrl;
@@ -38,9 +38,9 @@ export function DashboardContainer({
   const [agency] = useState(defaultAgency || 'noaa'); // nist, noaa, or nasa
   const [ghg, setSelectedGHG] = useState(defaultGhg || 'co2'); // co2 or ch4
   const [stationCode] = useState(defaultStationCode || ''); // buc, smt, etc
-  const [zoomLevel, setZoomLevel] = useState(isEmbedded ? 1 : defaultZoomLevel);
+  const [zoomLevel, setZoomLevel] = useState(isSimpleView ? 1 : defaultZoomLevel);
   const [zoomLocation, setZoomLocation] = useState(
-    isEmbedded ? [-40, 5] : defaultZoomLocation
+    isSimpleView ? [-40, 5] : defaultZoomLocation
   );
   const [selectedFrequency, setSelectedFrequency] = useState(
     defaultSelectedFrequency || 'all'
