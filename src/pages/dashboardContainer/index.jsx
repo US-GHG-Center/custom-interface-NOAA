@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { Dashboard } from '../dashboard/index.jsx';
 import { fetchAllFromFeaturesAPI } from '../../services/api.js';
@@ -17,11 +18,15 @@ export function DashboardContainer({
   defaultStationCode,
 }) {
   // Memoize the config to prevent unnecessary re-renders
+  const [searchParams] = useSearchParams();
   const { config } = useConfig();
   const [selectedStationId, setSelectedStationId] = useState('');
   const [stations, setStations] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingChartData, setLoadingChartData] = useState(false);
+
+  const isEmbedded = searchParams.get('viewMode') === 'simple';
+
 
   const FEATURES_API_URL = config?.featuresApiUrl;
 
@@ -29,12 +34,14 @@ export function DashboardContainer({
   const collectionUrl = `${FEATURES_API_URL}/collections`;
 
   // get the query params
-  
-  const [agency] = useState(defaultAgency|| 'noaa'); // nist, noaa, or nasa
+
+  const [agency] = useState(defaultAgency || 'noaa'); // nist, noaa, or nasa
   const [ghg, setSelectedGHG] = useState(defaultGhg || 'co2'); // co2 or ch4
   const [stationCode] = useState(defaultStationCode || ''); // buc, smt, etc
-  const [zoomLevel, setZoomLevel] = useState(defaultZoomLevel || 4); // let default zoom level controlled by map component
-  const [zoomLocation, setZoomLocation] = useState(defaultZoomLocation || []); // let default zoom location be controlled by map component
+  const [zoomLevel, setZoomLevel] = useState(isEmbedded ? 1 : defaultZoomLevel);
+  const [zoomLocation, setZoomLocation] = useState(
+    isEmbedded ? [-40, 5] : defaultZoomLocation
+  );
   const [selectedFrequency, setSelectedFrequency] = useState(
     defaultSelectedFrequency || 'all'
   ); // continuous or non-continuous
@@ -124,7 +131,7 @@ export function DashboardContainer({
     fetchCollectionItemValue();
   }, [selectedStationId]);
 
- 
+
 
   return (
     <Dashboard

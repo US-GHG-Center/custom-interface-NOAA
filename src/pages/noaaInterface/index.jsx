@@ -40,10 +40,8 @@ export function NoaaInterfaceContainer({
   const agency = searchParams.get('agency'); // nist, noaa, or nasa
   const ghg = searchParams.get('ghg'); // co2 or ch4
   const stationCode = searchParams.get('station-code'); // buc, smt, etc
-  const zoomLevel = useState(
-    searchParams.get('zoom-level') || defaultZoomLevel
-  );
-  const zoomLocation = searchParams.get('zoom-location' || defaultZoomLocation);
+  const zoomLevel = searchParams.get('zoom-level') || defaultZoomLevel;
+  const zoomLocation = searchParams.get('zoom-location') || defaultZoomLocation;
   const selectedFrequency = searchParams.get('frequency');
 
   return (

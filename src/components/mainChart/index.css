@@ -19,6 +19,7 @@
     width: 100%;
     padding: 10px;
     z-index: 1;
+    margin-top: 14px;
 }
 
 #chart-tools-left, #chart-tools-right {
