@@ -18,7 +18,6 @@ export const ChartMapResize = ({ resizeMap }) => {
 
   useEffect(() => {
     if (!map) return;
-    console.log('resizeMap', { resizeMap });
     if (resizeMap) map.resize();
   }, [map, resizeMap]);
 
