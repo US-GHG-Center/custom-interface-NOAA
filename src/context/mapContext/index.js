@@ -77,23 +77,6 @@ export const MapboxProvider = ({ children }) => {
     };
   }, []);
 
-  // ResizeObserver to handle container size changes (e.g., when chart panel opens/closes)
-  useEffect(() => {
-    if (!mapContainer.current || !map.current) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      if (map.current) {
-        map.current.resize();
-      }
-    });
-
-    resizeObserver.observe(mapContainer.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [map.current]);
-
   return (
     <MapboxContext.Provider value={{ map: map.current }}>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />

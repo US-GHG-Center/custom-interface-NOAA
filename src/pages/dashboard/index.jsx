@@ -42,6 +42,7 @@ import {
   ClearChart,
 } from '../../components';
 
+import { ChartMapResize } from '../../components/map/mapChartResize';
 import styled from 'styled-components';
 
 import './index.css';
@@ -69,7 +70,6 @@ export function Dashboard({
   selectedFrequency,
   setSelectedFrequency,
   agency,
-
 }) {
   const { config } = useConfig();
   // states for data
@@ -84,7 +84,7 @@ export function Dashboard({
   const [clearChart, setClearChart] = useState(true);
   const [displayChart, setDisplayChart] = useState(false);
   const [renderChart, setRenderChart] = useState(false);
-
+  const [resizeMap, setResizeMap] = useState(false);
   const prevChartDataRef = useRef([]);
 
   const logo = new URL('../../noaa-logo.png', import.meta.url);
@@ -102,6 +102,8 @@ export function Dashboard({
     setDisplayChart(false);
     setSelectedStationId(null);
     setIsNrtStation(false);
+    setResizeMap(true);
+    setTimeout(() => setResizeMap(false), 200);
   };
 
   const handleClearComplete = () => {
@@ -275,7 +277,7 @@ export function Dashboard({
                 <Title title={TITLE} ghg={ghg} frequency={selectedFrequency} />
               </Paper>
               <img src={logo} alt='NOAA' className='logo' />
-
+              <ChartMapResize resizeMap={resizeMap} />
               <MapZoom zoomLocation={zoomLocation} zoomLevel={zoomLevel} />
               {vizItems.map((item) => {
                 const [category, data] = Object.entries(item)[0];
