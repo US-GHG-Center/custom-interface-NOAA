@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useConfig } from '../configContext';
+import { debounce } from '../../utils/helpers';
 
 const MapboxContext = createContext();
 
@@ -80,18 +81,20 @@ export const MapboxProvider = ({ children }) => {
   useEffect(() => {
     if (!mapContainer.current || !map.current) return;
 
-    const resizeObserver = new ResizeObserver(() => {
+    const debouncedResize = debounce(() => {
       if (map.current) {
         map.current.resize();
       }
-    });
+    }, 100);
+
+    const resizeObserver = new ResizeObserver(debouncedResize);
 
     resizeObserver.observe(mapContainer.current);
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, [map.current]);
+  }, []);
 
   return (
     <MapboxContext.Provider value={{ map: map.current }}>

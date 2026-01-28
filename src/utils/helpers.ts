@@ -172,3 +172,13 @@ export function getDataAccessURL(station: Station): string {
 
   return `https://gml.noaa.gov/data/data.php?site=${siteName}&category=Greenhouse%2BGases&parameter_name=${parameterName}`;
 }
+
+export function debounce<T extends (...args: any[]) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return function(...args: Parameters<T>) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+}
