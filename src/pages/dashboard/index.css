@@ -31,7 +31,9 @@
   position: fixed;
   top: .7rem;
   right: .7rem;
-  width: 80px;
+  width: 12vw;
+  max-width: 70px;
+  min-width: 50px;
   height: auto;
   color: #082a63;
   z-index: 1000;
