@@ -12,7 +12,7 @@ export const MapZoom = ({ zoomLocation, zoomLevel }) => {
     map.flyTo({
       center: [lon, lat], // Replace with the desired latitude and longitude
       offset: zoomLevel ? [0, 0] : [-250, 0],
-      zoom: zoomLevel ? zoomLevel : 8.5,
+      zoom: zoomLevel ? zoomLevel : 2,
     });
   }, [map, zoomLevel, zoomLocation]);
 

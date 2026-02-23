@@ -3,18 +3,23 @@ import { greenhouseGases, measurementLegend } from '../../constants';
 import './index.css';
 
 export const Title = ({ title, frequency, ghg }) => {
+  const getSubtitle = () => {
+    let text = '';
+    if (ghg && greenhouseGases[ghg]) {
+      text += greenhouseGases[ghg].fullName;
+    }
+    if (frequency === 'all') {
+      text += ' Concentration Measurements';
+    } else if (frequency && measurementLegend[frequency]) {
+      text += ` ${measurementLegend[frequency].text}`;
+    }
+    return text;
+  };
+
   return (
-    <>
-      <Typography
-        variant='h6'
-        component='div'
-        className='title-text'
-        sx={{
-          fontWeight: 'bold',
-        }}
-      >
-        {title}: {ghg && greenhouseGases[ghg].fullName} {frequency && frequency !== 'all' && `${measurementLegend[frequency].text}`}
-      </Typography>
-    </>
+    <div className='title-text'>
+      <div className='title-header'>{title}</div>
+      <div className='title-subheader'>{getSubtitle()}</div>
+    </div>
   );
 };

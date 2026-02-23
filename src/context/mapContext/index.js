@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useConfig } from '../configContext';
+import { debounce } from '../../utils/helpers';
 
 const MapboxContext = createContext();
 
@@ -46,9 +47,9 @@ export const MapboxProvider = ({ children }) => {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: mapboxStyleUrl,
-        center: [-98.771556, 32.967243], // Centered on the US
-        zoom: 4,
-        projection: 'equirectangular',
+        center: [0, 0], // Centered globally
+        zoom: 2,
+        projection: 'mercator',
         options: {
           trackResize: true,
         },
@@ -74,6 +75,25 @@ export const MapboxProvider = ({ children }) => {
         map.current.remove();
         map.current = null;
       }
+    };
+  }, []);
+
+  // ResizeObserver to handle container size changes (e.g., when chart panel opens/closes)
+  useEffect(() => {
+    if (!mapContainer.current || !map.current) return;
+
+    const debouncedResize = debounce(() => {
+      if (map.current) {
+        map.current.resize();
+      }
+    }, 100);
+
+    const resizeObserver = new ResizeObserver(debouncedResize);
+
+    resizeObserver.observe(mapContainer.current);
+
+    return () => {
+      resizeObserver.disconnect();
     };
   }, []);
 

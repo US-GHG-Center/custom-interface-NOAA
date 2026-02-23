@@ -59,7 +59,7 @@ export const LineChart = ({
       type: 'time',
       display: true,
       time: {
-        tooltipFormat: 'dd MMM yyyy', // for tooltips
+        tooltipFormat: "MMM dd, yyyy, hh:mm:ss a '(UTC)'", // for tooltips
         unit: false, // let it auto-determine
       },
       grid: {

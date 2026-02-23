@@ -87,7 +87,7 @@ export function getPopUpContent(station: Station): string {
     ${station.meta.site_country ? `<b>${station.meta.site_country}</b><br>` : ""}
     Latitude: ${lat}<br>
     Longitude: ${lon}<br>
-    Elevation: ${station.meta.site_elevation}<br>
+    Elevation: ${station.meta.site_elevation} masl<br>
     Measurement Type: ${uniqueMeasurements}
   `;
 }
@@ -95,21 +95,21 @@ export function getPopUpContent(station: Station): string {
 
 export function getChartColor(collectionItem: CollectionItem): string {
   const colors = [
-    'rgba(68, 1, 84, 1)',
-    'rgba(255, 0, 0, 1)',
-    'rgba(0, 128, 0, 1)',
-    'rgba(0, 20, 252, 1)',
-    'rgba(255, 165, 0, 1)',
-    'rgba(0, 255, 255, 1)',
-    'rgba(255, 192, 203, 1)',
-    'rgba(128, 0, 128, 1)',
-    'rgba(34, 139, 34, 1)',
-    'rgba(0, 0, 128, 1)',
-    'rgba(128, 128, 0, 1)',
-    'rgba(255, 69, 0, 1)',
-    'rgba(75, 0, 130, 1)',
-    'rgba(0, 100, 0, 1)',
-    'rgba(139, 0, 0, 1)',
+    'rgba(105, 47, 119, 1)',
+    'rgba(198, 82, 64, 1)',
+    'rgba(41, 148, 41, 1)',
+    'rgba(27, 98, 220, 1)',
+    'rgba(234, 128, 41, 0.9)',
+    'rgba(35, 161, 161, 1)',
+    'rgba(197, 98, 115, 1)',
+    'rgba(129, 59, 129, 1)',
+    'rgba(49, 120, 49, 1)',
+    'rgba(44, 138, 167, 1)',
+    'rgba(122, 122, 57, 1)',
+    'rgba(191, 45, 12, 1)',
+    'rgba(77, 34, 106, 1)',
+    'rgba(61, 106, 61, 1)',
+    'rgba(140, 47, 47, 1)',
   ];
 
   const colorMapping: Record<string, string> = {};
@@ -171,4 +171,14 @@ export function getDataAccessURL(station: Station): string {
   parameterName = parameterName.replace(/%20/g, '%2B');
 
   return `https://gml.noaa.gov/data/data.php?site=${siteName}&category=Greenhouse%2BGases&parameter_name=${parameterName}`;
+}
+
+export function debounce<T extends (...args: any[]) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return function(...args: Parameters<T>) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
 }

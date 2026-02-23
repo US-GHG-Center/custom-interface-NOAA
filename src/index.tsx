@@ -16,8 +16,8 @@ root.render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
     <App />
-    // <React.StrictMode>
-    // </React.StrictMode>
+    {/* <React.StrictMode>
+    </React.StrictMode> */}
   </ThemeProvider>
 );
 
