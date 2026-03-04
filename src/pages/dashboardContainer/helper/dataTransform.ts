@@ -3,6 +3,7 @@ import {
   StationMeta,
   CollectionItem,
 } from '../../../dataModel';
+import { ignoreMeasurements } from '../../../constants';
 
 export interface StationMap {
   [key: string]: Station;
@@ -85,6 +86,11 @@ export function dataTransformCollection(
 
       const siteCodeUpper = sitecode.toUpperCase();
       const station = updatedStations[siteCodeUpper];
+
+      // ignore specific measurements based on station and instrument
+      if (ignoreMeasurements.some(im => im.station === station.id && im.instrument === measurement_inst)) {
+        return;
+      }
 
       if (
         station &&
