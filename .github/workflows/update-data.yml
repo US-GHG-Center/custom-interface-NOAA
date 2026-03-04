@@ -42,7 +42,7 @@ jobs:
     needs: preprocess-data
     strategy:
       matrix:
-        environment: [development]
+        environment: [development, production]
     environment: ${{ matrix.environment }}
 
     permissions:
