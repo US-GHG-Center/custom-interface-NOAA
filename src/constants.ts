@@ -87,3 +87,9 @@ export const measurementLegend = {
 export const ignoreStations = [
     { station: "MKO", ghg: GreenhouseGas.CARBON_DIOXIDE }, // Ignore MKO if GHG is Co2
 ];
+
+// Ignore PFP measurements for MLO and MKO stations
+export const ignoreMeasurements = [
+    { station: "MLO", instrument: InstrumentType.PFP },
+    { station: "MKO", instrument: InstrumentType.PFP },
+];
