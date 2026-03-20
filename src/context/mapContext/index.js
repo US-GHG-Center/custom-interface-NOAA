@@ -49,7 +49,7 @@ export const MapboxProvider = ({ children }) => {
         style: mapboxStyleUrl,
         center: [0, 0], // Centered globally
         zoom: 2,
-        projection: 'mercator',
+        projection: 'equirectangular',
         options: {
           trackResize: true,
         },

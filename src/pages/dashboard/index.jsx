@@ -318,7 +318,7 @@ export function Dashboard({
 
         <PanelResizeHandle
           className='resize-handle'
-          style={{ display: displayChart ? 'block' : 'none' }}
+          style={{ display: displayChart ? 'block' : 'none', backgroundColor: '#ffffff', width: '100%', zIndex: 0 }}
         >
           <DragHandleIcon title='Resize' />
         </PanelResizeHandle>
@@ -326,10 +326,10 @@ export function Dashboard({
         <Panel
           id='chart-panel'
           maxSize={75}
-          minSize={40}
+          minSize={35}
           className='panel panel-timeline'
           order={2}
-          style={{ display: displayChart ? 'block' : 'none' }}
+          style={{ display: displayChart ? 'block' : 'none', backgroundColor: '#ffffff' }}
         >
           <MainChart>
             {/* Instructions and Tools container */}
