@@ -76,11 +76,11 @@ button.menu-open-icon {
   left: 0;
   width: 100%;
   padding: 1rem;
-  margin-top: 1rem;
   font-family: 'Roboto', sans-serif;
   color: #8251df;
   font-size: .8rem;
   z-index: 100000;
+  background-color: #fff;
 }
 
 .nrt-station-note {
