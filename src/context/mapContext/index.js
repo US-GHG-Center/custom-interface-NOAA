@@ -49,10 +49,20 @@ export const MapboxProvider = ({ children }) => {
         style: mapboxStyleUrl,
         center: [0, 0], // Centered globally
         zoom: 2,
-        projection: 'equirectangular',
+        projection: 'globe',
         options: {
           trackResize: true,
         },
+      });
+
+      map.current.on('style.load', () => {
+        map.current.setFog({
+          color: 'rgb(186, 210, 235)', // Lower atmosphere
+          'high-color': 'rgb(36, 92, 223)', // Upper atmosphere
+          'horizon-blend': 0.01, // Atmosphere thickness
+          'space-color': 'rgb(11, 11, 25)', // Background color
+          'star-intensity': 0.6 // Background star brightness (default 0.35 at low zoooms )
+        });
       });
 
       // Disable rotation interactions after style is loaded
