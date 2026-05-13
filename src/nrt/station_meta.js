@@ -32,7 +32,7 @@ export const nrtStations = [
         chartColor: "rgba(0, 0, 255, 1)",
         chartId: 991,
         displayLine: false,
-        notice: "Mauna Loa Observatory (MLO) measurements were suspended from November 29, 2022 through July 4, 2023 due to a volcanic eruption. Measurements from the Mauna Kea Observatory (MKO), 21 miles to the northeast are substituted during this time period to fill in the Mauna Loa record.",
+        notice: "Mauna Loa Observatory (MLO) measurements were suspended from November 29, 2022 through July 4, 2023 due to a volcanic eruption. Measurements from the Mauna Kea Observatory (MKO), 21 miles to the northeast are substituted during this time period to fill in the Mauna Loa record. The Mauna Kea quality-controlled measurements are noted using coral color.",
         // Related station for historical data fill-in
         relatedStation: {
             stationCode: "MKO",
