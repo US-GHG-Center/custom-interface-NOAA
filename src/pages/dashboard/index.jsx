@@ -322,7 +322,7 @@ export function Dashboard({
                 <ChartInstruction />
               </ChartToolsLeft>
               <ChartToolsRight>
-                {isNrtStation && nrtStationMeta && (
+                {isNrtStation && nrtStationMeta?.source && (
                   <DataAccessTool
                     dataAccessLink={nrtStationMeta.source}
                     tooltip='Access NRT Dataset'
@@ -366,7 +366,7 @@ export function Dashboard({
               ))}
           </MainChart>
         </Panel>
-        {isNrtStation && nrtStationMeta && (
+        {isNrtStation && nrtStationMeta?.notice && (
           <div
             className='nrt-station-note-container'
             style={{ display: displayChart ? 'block' : 'none' }}
