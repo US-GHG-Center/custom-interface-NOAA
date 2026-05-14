@@ -78,8 +78,6 @@ export function Dashboard({
   const [dataAccessURL, setDataAccessURL] = useState('');
   const [legendData, setLegendData] = useState([]);
 
-  const [isNrtStation, setIsNrtStation] = useState(false);
-  const [nrtStationMeta, setNrtStationMeta] = useState(null);
 
   const [clearChart, setClearChart] = useState(true);
   const [displayChart, setDisplayChart] = useState(false);
@@ -90,18 +88,12 @@ export function Dashboard({
   const logo = new URL('../../noaa-logo.png', import.meta.url);
   // handler functions
   const handleSelectedVizItem = (vizItemId) => {
-    if (nrtStationCodes.includes(vizItemId) && ghg === 'co2') {
-      setIsNrtStation(true);
-    } else {
-      setIsNrtStation(false);
-    }
     setSelectedStationId(vizItemId);
   };
 
   const handleChartClose = () => {
     setDisplayChart(false);
     setSelectedStationId(null);
-    setIsNrtStation(false);
   };
 
   const handleClearComplete = () => {
@@ -110,21 +102,14 @@ export function Dashboard({
   };
 
   // Handle special case of NRT dataset
+  const nrtStationMeta = React.useMemo(() => {
+    if (!selectedStationId) return null;
+    return nrtStations.find(
+      (station) => station.stationCode === selectedStationId && station.ghg === ghg
+    ) || null;
+  }, [selectedStationId, ghg]);
 
-  // fetch nrt/station_meta.js and add station_codes to nrtStationCodes
-  const nrtStationCodes = [
-    ...new Set(nrtStations.map((station) => station.stationCode)),
-  ];
-
-  // update nrtStationMeta state if the station is NRT station
-  useEffect(() => {
-    if (!isNrtStation) return;
-
-    const selectedNrtStation = nrtStations.find(
-      (station) => station.stationCode === selectedStationId
-    );
-    setNrtStationMeta(selectedNrtStation || null); // Override with the current station or null if not found
-  }, [isNrtStation, selectedStationId]);
+  const isNrtStation = !!nrtStationMeta;
 
   // update legend based on the vizItems and selectedFrequency
   useEffect(() => {
@@ -208,10 +193,9 @@ export function Dashboard({
       setDisplayChart(false);
     }
 
-    if (nrtStationMeta && nrtStationMeta.stationCode === selectedStationId) {
+    if (nrtStationMeta) {
       handleSpecialCases(
         stationData,
-        isNrtStation,
         nrtStationMeta,
         setChartData,
         config
@@ -220,7 +204,7 @@ export function Dashboard({
 
     // Set data access URL
     setDataAccessURL(getDataAccessURL(stationData[selectedStationId]));
-  }, [selectedStationId, vizItems, selectedFrequency]);
+  }, [selectedStationId, vizItems, selectedFrequency, nrtStationMeta, isNrtStation, stationData, config, ghg]);
 
   // set vizItems when stationData or data frequency changes
   useEffect(() => {
@@ -338,7 +322,7 @@ export function Dashboard({
                 <ChartInstruction />
               </ChartToolsLeft>
               <ChartToolsRight>
-                {isNrtStation && nrtStationMeta && (
+                {isNrtStation && nrtStationMeta?.source && (
                   <DataAccessTool
                     dataAccessLink={nrtStationMeta.source}
                     tooltip='Access NRT Dataset'
@@ -382,7 +366,7 @@ export function Dashboard({
               ))}
           </MainChart>
         </Panel>
-        {isNrtStation && nrtStationMeta && (
+        {isNrtStation && nrtStationMeta?.notice && (
           <div
             className='nrt-station-note-container'
             style={{ display: displayChart ? 'block' : 'none' }}
